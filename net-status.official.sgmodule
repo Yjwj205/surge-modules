@@ -7,10 +7,10 @@
 
 [Script]
 # Event - 网络变化即时通知
-{{{EVENT_SCRIPT_NAME}}} = type=event,event-name=network-changed,timeout=120,script-path=https://raw.githubusercontent.com/1433735029/surge-modules/main/net-status.js,argument="TYPE=EVENT&icon={{{ICON}}}&icon-color={{{ICON-COLOR}}}&TIMEOUT={{{TIMEOUT}}}&EVENT_DELAY={{{EVENT_DELAY}}}"
+{{{EVENT_SCRIPT_NAME}}} = type=event,event-name=network-changed,timeout=120,script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/net-status.js,argument="TYPE=EVENT&icon={{{ICON}}}&icon-color={{{ICON-COLOR}}}&TIMEOUT={{{TIMEOUT}}}&EVENT_DELAY={{{EVENT_DELAY}}}"
 
 # Panel - 网络状态面板
-网络状态面板 = type=generic,timeout=120,script-path=https://raw.githubusercontent.com/1433735029/surge-modules/main/net-status.js,argument="icon={{{ICON}}}&icon-color={{{ICON-COLOR}}}&TIMEOUT={{{TIMEOUT}}}"
+网络状态面板 = type=generic,timeout=120,script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/net-status.js,argument="icon={{{ICON}}}&icon-color={{{ICON-COLOR}}}&TIMEOUT={{{TIMEOUT}}}"
 
 [Panel]
 {{{PANEL_NAME}}} = script-name=网络状态面板,update-interval={{{UPDATE-INTERVAL}}}
