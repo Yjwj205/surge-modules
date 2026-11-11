@@ -26,9 +26,9 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 1. 保持 `capture=true` → Safari 打开 `https://ikuuu.org` 登录一次 → 抓取成功后可在模块参数里把 `capture` 改成 `false`；
 2. 或在 `cookie` 参数里直接粘贴（支持带 `Cookie:` 前缀）。
 
-**手动签到**：首页面板「iKuuu 手动签到」，点一下立即执行一次。
-
 抓取有两条路径：已登录状态下访问任意 ikuuu 页面（请求头 Cookie），以及登录瞬间的响应 `Set-Cookie`。抓不到时会提示原因（10 分钟限一次）。
+
+模块只保留定时任务，没有手动面板；想立即跑一次，可在 Surge 的「脚本」里直接运行 `iKuuu-CheckinCron` 对应的脚本（或把 cron 时间临时改到下一分钟）。
 
 ---
 
@@ -48,8 +48,6 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 
 **首次使用**：保持 `ENABLE_CAPTURE=true` → Safari 打开 `https://www.nodeseek.com` 并登录，触发一次 `getInfo` 请求即可自动保存 Cookie，之后可关闭抓取。
 
-**手动签到**：首页面板「NodeSeek 手动签到」（原插件只有定时任务，这里补了手动入口）。
-
 > 重复签到说明：NodeSeek 对当天已签到会返回 **HTTP 500 +「今天已完成签到，请勿重复操作」**。脚本已把这种情况识别为「✅ 今日已签到」，不再报错。
 
 ---
@@ -61,7 +59,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 | 参数传递 | `[Argument]` + `$argument` 对象 | 模块 `#!arguments` + `argument="k=v&k2=v2"`，脚本内自行解析（两个脚本都已加解析函数） |
 | 开关控制 | `with enable=${capture}` | Surge 无脚本级开关 → 改为把 `capture` 传入脚本，由脚本自行短路 |
 | 定时 | `cron ${cronExpr}` | `type=cron, cronexp="{{{cronExpr}}}"`，附 `wake-system=1` |
-| 手动执行 | `generic`（Loon 内有运行入口） | `type=generic` + `[Panel]` 面板一键运行 |
+| 手动执行 | `generic`（Loon 内有运行入口） | 只保留 `cron` 定时；临时手动可改 cron 时间或用 Surge 脚本列表单跑 |
 | 抓取 | `http-request` 脚本 | `type=http-request`，`max-size=-1` |
 | 节点指定 | `options.node`（Loon 专有） | 仅在 Loon 环境传，Surge 自动忽略（`requestNode` 参数已从 Surge 模块移除） |
 | MitM | `[Mitm] hostname=` | `[MITM] hostname = %APPEND%`，只追加 |
