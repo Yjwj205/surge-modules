@@ -72,6 +72,38 @@ try {
     return "";
   }
 
+  // 登录响应：直接从 Set-Cookie 里拿登录凭证
+  if (typeof $response !== "undefined") {
+    try {
+      var sc = ($response && $response.headers && ($response.headers["Set-Cookie"] || $response.headers["set-cookie"])) || "";
+      if (Array.isArray(sc)) sc = sc.join("; ");
+      var parts = String(sc).split(/,(?=\s*[A-Za-z0-9_!#$%&'*+.^`|~-]+=)/);
+      var picked = [];
+      parts.forEach(function (one) {
+        var kv = String(one).split(";")[0].trim();
+        if (LOGIN_COOKIE.test("; " + kv)) picked.push(kv);
+      });
+      if (picked.length) {
+        var line = picked.join("; ");
+        var prev = "";
+        try { prev = String($persistentStore.read(COOKIE_KEY) || ""); } catch (e) {}
+        if (prev !== line) {
+          var ok2 = false;
+          try { ok2 = $persistentStore.write(line, COOKIE_KEY); } catch (e) {}
+          if (ok2) {
+            try { $persistentStore.write(JSON.stringify({ t: Date.now(), result: "登录响应中已保存 Cookie" }), "ikuuu_capture_state"); } catch (e) {}
+            notify("已获取登录 Cookie", "登录成功，Cookie 已保存。可以在模块里把「抓取 Cookie」关掉了。");
+          }
+        }
+      } else {
+        console.log("[iKuuu] 登录响应里没有登录类 Set-Cookie，跳过");
+      }
+    } catch (e) {
+      console.log("[iKuuu] 解析 Set-Cookie 失败：" + e);
+    }
+    return $done({});
+  }
+
   var cookie = "";
   try {
     cookie = findCookie($request && $request.headers).trim();

@@ -7,7 +7,8 @@
 #!arguments-desc=[cookie] 手动填写 Cookie，留空则用自动抓取的值 / [capture] 抓取 Cookie 开关，true 开启 / [notify] 签到通知，true 开启 / [cronExpr] 5 段 cron，默认每天 08:00
 
 [Script]
-iKuuu-CookieCapture = type=http-request, pattern=^https?:\/\/(?:www\.)?ikuuu\.org/, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-cookie.js, script-update-interval=600, argument="notify={{{notify}}}&capture={{{capture}}}", max-size=-1
+iKuuu-CookieCapture = type=http-request, pattern=^https?:\/\/(?:www\.)?ikuuu\.org(?:[\/?]|$), script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-cookie.js, script-update-interval=600, argument="notify={{{notify}}}&capture={{{capture}}}", max-size=-1
+iKuuu-LoginCookie = type=http-response, pattern=^https:\/\/ikuuu\.org\/auth\/login, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-cookie.js, script-update-interval=600, argument="notify={{{notify}}}&capture={{{capture}}}", max-size=0
 iKuuu-CheckinManual = type=generic, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-checkin.js, script-update-interval=600, argument="cookie={{{cookie}}}&notify={{{notify}}}", timeout=60
 iKuuu-CheckinCron = type=cron, cronexp="{{{cronExpr}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-checkin.js, script-update-interval=600, argument="cookie={{{cookie}}}&notify={{{notify}}}", timeout=60, wake-system=1
 
