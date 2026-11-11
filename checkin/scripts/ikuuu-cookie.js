@@ -79,13 +79,21 @@ try {
     console.log("[iKuuu] 读取请求头失败：" + e);
   }
 
+  function markState(result) {
+    try {
+      $persistentStore.write(JSON.stringify({ t: Date.now(), result: result }), "ikuuu_capture_state");
+    } catch (e) {}
+  }
+
   if (!cookie) {
     console.log("[iKuuu] 本次请求没有 Cookie，跳过");
+    markState("请求里没有 Cookie（可能未登录）");
     return $done({});
   }
 
   if (!LOGIN_COOKIE.test(cookie)) {
     console.log("[iKuuu] 当前是未登录状态，忽略本次 Cookie");
+    markState("未登录（游客 Cookie，已忽略）");
     return $done({});
   }
 
@@ -107,6 +115,7 @@ try {
   }
 
   if (saved) {
+    markState("已保存 Cookie");
     console.log("[iKuuu] 已保存登录 Cookie（" + cookie.length + " 字节）");
     notify("已获取登录 Cookie",
       "可以在插件里把「抓取 Cookie」开关关掉了，签到会继续使用这份 Cookie。");
