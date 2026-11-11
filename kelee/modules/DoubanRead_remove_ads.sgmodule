@@ -1,0 +1,16 @@
+#!name=豆瓣阅读去广告
+#!desc=移除开屏广告、弹窗广告、热门搜索、热搜榜。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/DoubanRead.png
+#!category=去广告
+
+[Map Local]
+(?i)^https:\/\/read\.douban\.com\/api\/v2\/ads\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/read\.douban\.com\/api\/v2\/popup$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/read\.douban\.com\/api\/v2\/search\/hot_words$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/read\.douban\.com\/api\/v2\/search\/hot_charts$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/read\.douban\.com\/api\/v2\/search\/rec_urls$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% read.douban.com

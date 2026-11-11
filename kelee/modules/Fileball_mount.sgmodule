@@ -1,0 +1,12 @@
+#!name=Fileball网盘挂载
+#!desc=支持挂载阿里云盘、夸克网盘和PikPak网盘，点击下方署名查看使用方法。
+#!author=小白脸
+#!homepage=https://github.com/luestr/ProxyResource/blob/main/Resource/Markdown/Fileball/README.md
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Fileball.png
+#!category=功能增强
+
+[Script]
+Fileball_mount · 三合一网盘挂载 = type=http-request, pattern=(?i)^http:\/\/(aliyun|quark|pikpak)\.example\.com, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/Fileball/Fileball_mount.js, requires-body=1, max-size=-1
+
+[MITM]
+hostname = %APPEND% aliyun.example.com, quark.example.com, pikpak.example.com

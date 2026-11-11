@@ -1,0 +1,16 @@
+#!name=易校园去广告
+#!desc=移除开屏广告、横幅广告、弹窗广告、悬浮广告、文末广告、消息广告、校园头条，精简首页金刚位和我的页面。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YiSchool.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/compus\.xiaofubao\.com\/compus\/user\/getUserExt$ 'del(.data.adPopSwitch) | del(.data.adSplashSwitch)'
+http-response-jq (?i)^https:\/\/compus\.xiaofubao\.com\/compus\/application\/getHomeAppList$ '.rows|=map(select(.appCode=="kechengbiao_app1" or .appCode=="siliuji" or .appCode=="NEWJIAOFEIDATING"))'
+
+[Map Local]
+(?i)^https:\/\/compus\.xiaofubao\.com\/compus\/advertising\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% compus.xiaofubao.com

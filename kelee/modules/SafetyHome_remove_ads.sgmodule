@@ -1,0 +1,15 @@
+#!name=360智慧生活去广告
+#!desc=移除开屏广告、首页推广横幅、商城入口及我的页面推广。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/SafetyHome.png
+#!category=去广告
+
+[Rule]
+DOMAIN, ad.iot.360.cn, REJECT
+
+[Map Local]
+(?i)^https:\/\/app\.home\.360\.cn\/v1\/config\/custom_config data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% app.home.360.cn

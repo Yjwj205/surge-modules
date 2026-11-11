@@ -1,0 +1,16 @@
+#!name=风鸟去广告
+#!desc=移除首页信息流和轮播图
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/RiskBird.png
+#!category=去广告
+
+[Map Local]
+(?i)^https:\/\/m\.riskbird\.com\/prod-qbb-api\/user\/getBannerList data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/m\.riskbird\.com\/prod-qbb-api\/searchHotEnt data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[Script]
+RiskBird_remove_ads · 移除推荐老板 = type=http-response, pattern=(?i)^https:\/\/m\.riskbird\.com\/prod-qbb-api\/query\/person\/personRecommend, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/RiskBird/RiskBird_remove_ads.js, requires-body=1, max-size=-1
+
+[MITM]
+hostname = %APPEND% m.riskbird.com

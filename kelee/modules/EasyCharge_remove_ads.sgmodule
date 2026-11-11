@@ -1,0 +1,20 @@
+#!name=e充电去广告
+#!desc=移除开屏广告、活动及发现页面，精简我的页面。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/EasyCharge.png
+#!category=去广告
+
+[Rule]
+DOMAIN, adash-evone.echargenet.com, REJECT
+
+[Map Local]
+(?i)^https:\/\/aserver-evone\.echargenet\.com\/orange\/datacenter\/snapshot-meta\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api-evone\.echargenet\.com\/gw\/evone\.echargeapi\.open\.ad\.getadmaterials\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api-evone\.echargenet\.com\/gw\/evone\.appsns\.open\.efriend\.topic\.listrecommenttopic\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api-evone\.echargenet\.com\/gw\/evone\.appsns\.open\.efriend\.post\.listapppost\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api-evone\.echargenet\.com\/gw\/evone\.appsns\.open\.merchant\.merchant\.list\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api-evone\.echargenet\.com\/gw\/evone\.appsns\.open\.merchant\.news\.pagelistapp\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% aserver-evone.echargenet.com, api-evone.echargenet.com

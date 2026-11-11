@@ -1,0 +1,21 @@
+#!name=Apple天气增强
+#!desc=解锁Apple天气的全部功能、替换空气质量数据源、添加下一小时降水数据、添加天气数据。
+#!author=VirgilClyne[https://github.com/VirgilClyne], WordlessEcho[https://github.com/WordlessEcho], 001[https://github.com/001ProMax]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/AppleWeather.png
+#!category=功能增强
+#!arguments=Weather.Provider:ColorfulClouds,NextHour.Provider:ColorfulClouds,AirQuality.Calculate.Algorithm:EU_EAQI,API.ColorfulClouds.Token:,API.QWeather.Host:devapi.qweather.com,API.QWeather.Token:,API.WAQI.Token:,Storage:Argument,LogLevel:WARN
+#!arguments-desc=[Weather.Provider] [天气]数据源 / [NextHour.Provider] [未来一小时降水强度]数据源 / [AirQuality.Calculate.Algorithm] AQI算法 / [API.ColorfulClouds.Token] [API]彩云天气令牌 / [API.QWeather.Host] [API]和风天气主机 / [API.QWeather.Token] [API]和风天气令牌 / [API.WAQI.Token] [API]WAQI令牌 / [Storage] [储存]配置类型 / [LogLevel] [调试]日志等级
+
+[Rule]
+DOMAIN, weather-analytics-events.apple.com, REJECT-DROP
+DOMAIN, tether.edge.apple, REJECT-DROP
+DOMAIN-SUFFIX, tthr.apple.com, REJECT-DROP
+AND, ((OR, ((IP-ASN, 714, no-resolve), (IP-ASN, 6185, no-resolve))), (PROTOCOL, QUIC)), REJECT-DROP
+
+[Script]
+AppleWeatherEnhancer · 天气可用性响应 = type=http-response, pattern=(?i)^https?:\/\/weatherkit\.apple\.com\/api\/v1\/availability\/, script-path=https://github.com/NSRingo/WeatherKit/releases/download/v3.1.0/response.bundle.js, argument="${Weather.Provider}={{{${Weather.Provider}}}}&${NextHour.Provider}={{{${NextHour.Provider}}}}&${AirQuality.Calculate.Algorithm}={{{${AirQuality.Calculate.Algorithm}}}}&${API.ColorfulClouds.Token}={{{${API.ColorfulClouds.Token}}}}&${API.QWeather.Host}={{{${API.QWeather.Host}}}}&${API.QWeather.Token}={{{${API.QWeather.Token}}}}&${API.WAQI.Token}={{{${API.WAQI.Token}}}}&Storage={{{Storage}}}&LogLevel={{{LogLevel}}}", requires-body=1, max-size=-1
+AppleWeatherEnhancer · 天气响应 = type=http-response, pattern=(?i)^https?:\/\/weatherkit\.apple\.com\/api\/v2\/weather\/, script-path=https://github.com/NSRingo/WeatherKit/releases/download/v3.1.0/response.bundle.js, argument="${Weather.Provider}={{{${Weather.Provider}}}}&${NextHour.Provider}={{{${NextHour.Provider}}}}&${AirQuality.Calculate.Algorithm}={{{${AirQuality.Calculate.Algorithm}}}}&${API.ColorfulClouds.Token}={{{${API.ColorfulClouds.Token}}}}&${API.QWeather.Host}={{{${API.QWeather.Host}}}}&${API.QWeather.Token}={{{${API.QWeather.Token}}}}&${API.WAQI.Token}={{{${API.WAQI.Token}}}}&Storage={{{Storage}}}&LogLevel={{{LogLevel}}}", requires-body=1, binary-body-mode=1, max-size=-1
+
+[MITM]
+hostname = %APPEND% weatherkit.apple.com

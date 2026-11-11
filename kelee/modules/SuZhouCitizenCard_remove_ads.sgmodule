@@ -1,0 +1,13 @@
+#!name=智慧苏州去广告
+#!desc=移除开屏广告、横幅，移除信息流推广。
+#!author=xream[https://github.com/xream]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/SuZhouCitizenCard.png
+#!category=去广告
+
+[Map Local]
+(?i)^https?:\/\/newapp2\.szsmk\.com\/app\/config\/queryMainAd data-type=base64 data="eyJtZXNzYWdlIjoi5pON5L2c5oiQ5YqfIiwibWFpbl9hZF9saXN0IjpbXSwiY29kZSI6IjAwMDAwMCJ9" header="Content-Type:application/json" status-code=200
+(?i)^https?:\/\/newapp2\.szsmk\.com\/app\/config\/(queryCarousel|queryRecommendation)\/ data-type=base64 data="eyJjb2RlIjoiMDAwMDAwIiwibWVzc2FnZSI6IuaTjeS9nOaIkOWKnyIsImxpc3QiOltdfQ==" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% newapp2.szsmk.com

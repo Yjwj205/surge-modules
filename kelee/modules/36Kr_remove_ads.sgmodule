@@ -1,0 +1,29 @@
+#!name=36氪去广告
+#!desc=移除开屏广告、首页右上角运营位、信息流广告、文末广告，移除相关文章推荐、大家都在看及皮肤配置，精简搜索页面、我的页面及底栏。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/36Kr.png
+#!category=去广告
+
+[Rule]
+DOMAIN, adx.36kr.com, REJECT
+DOMAIN, ad.jiemian.com, REJECT
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/sys\/config\? 'del(.data.contentConfig) | del(.data.positionConfigList) | del(.data.switchConfig.ios.sunrise_sign) | del(.data.switchConfig.ios.sunrise_sunit_task) | del(.data.switchConfig.ios.sunrise_sunit_mall) | del(.data.switchConfig.ios.sunrise_distribution_icon) | del(.data.secondFloorConfig)'
+http-response-jq (?i)^https:\/\/36kr\.com\/global\/sensors\/config\/iOS\.conf\? '.configs.disableSDK = true'
+http-response-jq (?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/nav\? '.data.navList |= [ .[] | select(.navNick == "home" or .navNick == "newsflash" or .navNick == "me") ]'
+http-response-jq (?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/nav\/home\/subnav\/recom\? '.data.bannerList |= map(select(.itemType != 0))'
+http-response-jq (?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/nav\/home\/subnav\/flow\/ 'del(.data.adItemList)'
+
+[Map Local]
+(?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/nav\/me\/recom\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/nav\/search\/hotword\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/nav\/search\/topicListV2\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gateway\.36kr\.com\/api\/adx\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/page\/article\/recom\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/page\/newsflash\/recom\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gateway\.36kr\.com\/api\/mis\/sys\/skin\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% gateway.36kr.com, 36kr.com

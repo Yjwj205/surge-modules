@@ -1,0 +1,16 @@
+#!name=一甜相机去广告
+#!desc=移除开屏广告、悬浮广告及图片选择器横幅广告。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Yitian.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/(m2u-api\.getkwai|api-m2u\.kuaishou)\.com\/api-server\/api\/v1\/system\/configs\? 'del(.data.shouldUseLMAdFirst) | del(.data.incentiveCfgList)'
+
+[Map Local]
+(?i)^https:\/\/(m2u-api\.getkwai|api-m2u\.kuaishou)\.com\/api-server\/api\/v1\/ad\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/(m2u-api\.getkwai|api-m2u\.kuaishou)\.com\/api-server\/api\/v4\/op\/actPositions\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% m2u-api.getkwai.com, api-m2u.kuaishou.com

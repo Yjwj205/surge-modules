@@ -1,0 +1,16 @@
+#!name=VVebo时间线修复
+#!desc=修复失效的用户时间线和我的页面。使用此插件前需要禁用微博去广告插件，避免插件冲突导致失效。
+#!author=suiyuran[https://github.com/suiyuran], androidcn[https://github.com/androidcn]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/VVebo.png
+#!category=功能增强
+
+[Script]
+VVebo_repair · 修复时间线 = type=http-request, pattern=(?i)^https:\/\/api\.weibo\.cn\/2\/users\/show\?, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/VVebo/VVebo_repair.js
+VVebo_repair · 修复时间线 #2 = type=http-request, pattern=(?i)^https:\/\/api\.weibo\.cn\/2\/statuses\/user_timeline\?, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/VVebo/VVebo_repair.js
+VVebo_repair · 修复时间线 #3 = type=http-request, pattern=(?i)^https:\/\/api\.weibo\.cn\/2\/remind\/unread_count\?, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/VVebo/VVebo_repair.js
+VVebo_repair · 修复时间线 #4 = type=http-response, pattern=(?i)^https:\/\/api\.weibo\.cn\/2\/profile\/statuses\/tab\?, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/VVebo/VVebo_repair.js, requires-body=1, max-size=-1
+VVebo_repair · 修复我的页面 = type=http-response, pattern=(?i)^https:\/\/api\.weibo\.cn\/2\/cardlist\?, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/VVebo/VVebo_repair.js, requires-body=1, max-size=-1
+
+[MITM]
+hostname = %APPEND% api.weibo.cn

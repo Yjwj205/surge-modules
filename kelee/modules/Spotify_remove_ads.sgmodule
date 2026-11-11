@@ -1,0 +1,23 @@
+#!name=Spotify去广告
+#!desc=移除播放广告，恢复歌手和专辑列表的正常展示。修改插件自定义配置项需要重新登陆方可生效。
+#!author=001ProMax[https://github.com/001ProMax]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Spotify.png
+#!category=去广告
+#!arguments=tab:false,useractivity:true
+#!arguments-desc=[tab] 移除底栏创建按钮 / [useractivity] 启用Apple设备接力
+
+[Rule]
+AND, ((DOMAIN-SUFFIX, spotify.com), (PROTOCOL, QUIC)), REJECT
+
+[URL Rewrite]
+(?i)^https:\/\/(?:\w+-spclient|spclient\.wg)\.spotify\.com(?::443)?\/artistview\/v1\/artist\/(.*)&platform=iphone https://spclient.wg.spotify.com/artistview/v1/artist/$1&platform=ipad header
+
+[Map Local]
+(?i)^https:\/\/(?:\w+-spclient|spclient\.wg)\.spotify\.com(?::443)?\/pendragon\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[Script]
+Spotify_remove_ads · Protobuf处理 = type=http-response, pattern=(?i)^https:\/\/(?:\w+-spclient|spclient\.wg)\.spotify\.com(?::443)?\/(?:bootstrap|user-customization-service), script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/Spotify/Spotify_remove_ads.js, argument="tab={{{tab}}}&useractivity={{{useractivity}}}", requires-body=1, binary-body-mode=1, max-size=-1, timeout=5
+
+[MITM]
+hostname = %APPEND% *-spclient.spotify.com, spclient.wg.spotify.com

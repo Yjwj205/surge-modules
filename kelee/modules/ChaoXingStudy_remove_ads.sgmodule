@@ -1,0 +1,20 @@
+#!name=学习通去广告
+#!desc=移除开屏广告、横幅推广，精简校园补给站频道。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/ChaoXingStudy.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/learn\.chaoxing\.com\/apis\/service\/appConfig\? 'del(.data.ad)'
+http-response-jq (?i)^https:\/\/apps\.chaoxing\.com\/apis\/home\/getHpXsqy\.jspx\? '.data.list |= map(select(.pid == 4 or .pid == 44)) | .data.list_xsqy |= map(select(.pid == 4 or .pid == 44)) | .data.list_xysqbj |= map(select(.pid == 4 or .pid == 44)) | .data.lanmu |= map(select(.id == 4 or .id == 44))'
+http-response-jq (?i)^https:\/\/apps\.chaoxing\.com\/apis\/home\/getHpXsqy\.jspx\? 'del(.data.list_timeapp)'
+
+[Map Local]
+(?i)^https:\/\/home-yd\.chaoxing\.com\/apis\/data\/getAdsRecommend\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/home-yd\.chaoxing\.com\/apis\/banner\/getConfigInfoForXsqy\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/groupyd2\.chaoxing\.com\/apis\/activity\/getActivitys_attention\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appswh\.chaoxing\.com\/apis\/activity\/getNoteTopicList\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% learn.chaoxing.com, home-yd.chaoxing.com, apps.chaoxing.com, groupyd2.chaoxing.com, appswh.chaoxing.com

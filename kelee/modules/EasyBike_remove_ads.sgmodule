@@ -1,0 +1,12 @@
+#!name=哈罗去广告
+#!desc=移除开屏广告及歌单广告
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/EasyBike.png
+#!category=去广告
+
+[Script]
+EasyBike_remove_ads · 去广告 = type=http-response, pattern=(?i)^https:\/\/mobileconfig-gateway\.hellobike\.com\/api$, script-path=https://kelee.one/Resource/JavaScript/EasyBike/mobileconfig-gateway.js, requires-body=1, max-size=-1
+
+[MITM]
+hostname = %APPEND% mobileconfig-gateway.hellobike.com

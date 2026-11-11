@@ -1,0 +1,14 @@
+#!name=Follow每日签到
+#!desc=Follow每日签到，需要进入此插件的主页链接，阅读使用说明操作。
+#!author=gideonsenku[https://github.com/gideonsenku], 可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://github.com/luestr/ProxyResource/blob/main/Resource/Markdown/FollowRSS/README.md
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/FollowRSS.png
+#!category=签到
+#!arguments=token:,cookie:,cron:0 1 * * *
+#!arguments-desc=[token] csrfToken / [cookie] Cookie / [cron] 定时参数
+
+[Script]
+FollowRSS_checkin · Follow每日签到 = type=cron, cronexp="{{cron}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/FollowRSS/FollowRSS_checkin.js, argument="token={{{token}}}&cookie={{{cookie}}}", timeout=120
+
+[MITM]
+hostname = %APPEND% api.follow.is

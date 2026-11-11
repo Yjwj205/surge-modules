@@ -1,0 +1,24 @@
+#!name=联掌门户去广告
+#!desc=移除开屏广告、弹窗，移除首页、服务和发现页面无用内容。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/LZMH.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/lzmh\.lz-qs\.com:6025\/lzmh_app_api\/api\/v2\/user\/getUserBaseInfoAndConfig\? 'del(.value.config)'
+
+[Map Local]
+(?i)^https:\/\/lzmh\.lz-qs\.com:6025\/lzmh_app_api\/api\/v1\/app3rd\/getApp3rdGenreList\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/lzmh\.lz-qs\.com:6025\/lzmh_app_api\/api\/v1\/ad\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/yuudnn\.lz-qs\.com:9220\/mssp-api\/api\/v1\/mrtb\/getAdSlotList$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/yuudnn\.lz-qs\.com:9220\/mssp-api\/api\/v1\/mrtb\/requestAd$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/yuudnn\.lz-qs\.com:9220\/mssp-api\/api\/v1\/mrtb\/getSdkStartConfigList$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/lzmh\.lz-qs\.com:6025\/lzmh_app_api\/api\/v1\/index\/getRecommendList\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/yuudnn\.lz-qs\.com\/lzmh_app_api\/o2o\/api\/v2\/o2o\/homeInfo$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/yuudnn\.lz-qs\.com\/lzmh_app_api\/o2o\/api\/v2\/o2o\/homeShopList$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/yuudnn\.lz-qs\.com:9220\/mssp-api\/api\/v1\/mrtb\/getSdkAdSlotList$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^http:\/\/lzmh\.lz-qs\.com:5090\/resource\/download\/ data-type=text data="" status-code=404
+
+[MITM]
+hostname = %APPEND% lzmh.lz-qs.com, yuudnn.lz-qs.com

@@ -1,0 +1,18 @@
+#!name=12306去广告
+#!desc=过滤12306应用内广告及开屏广告
+#!author=RuCu6[https://github.com/RuCu6], 可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/12306.png
+#!category=去广告
+
+[Rule]
+DOMAIN, ad.12306.cn, DIRECT
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/ad\.12306\.cn\/ad\/ser\/getAdList$ 'del(.materialsList) | del(.advertParam)'
+
+[Script]
+12306_remove_ads · 移除12306应用内广告 = type=http-request, pattern=(?i)^https:\/\/mobile\.12306\.cn\/otsmobile\/app\/mgs\/mgw\.htm$, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/12306/12306_remove_ads.js
+
+[MITM]
+hostname = %APPEND% ad.12306.cn, mobile.12306.cn

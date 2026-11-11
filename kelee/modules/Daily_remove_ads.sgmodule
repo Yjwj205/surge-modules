@@ -1,0 +1,12 @@
+#!name=推栏去广告
+#!desc=过滤推栏广告
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Daily.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https?:\/\/m\.pvp\.xoyo\.com\/conf\/server-mapping$ 'del(.data.splashConf) | del(.data.splashConfNew)'
+
+[MITM]
+hostname = %APPEND% m.pvp.xoyo.com

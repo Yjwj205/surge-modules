@@ -1,0 +1,12 @@
+#!name=Tumblr去广告
+#!desc=移除信息流广告
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Tumblr.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/api-http2\.tumblr\.com\/v2\/config$ 'del(.response.ad_placement_configuration) | del(.response.configuration.fan_placement_id) | del(.response.configuration.display_io_max_ad_count) | del(.response.configuration.display_io_max_ad_loading_count) | del(.response.configuration.display_io_placement_id) | del(.response.configuration.display_io_test_placement_id) | del(.response.configuration.display_io_interscroller_display_test_placement_id) | del(.response.configuration.display_io_interscroller_video_test_placement_id) | del(.response.configuration.dfp_ad_unit_id) | del(.response.configuration.adx_total_queue_size) | del(.response.configuration.adx_loading_queue_size) | del(.response.configuration.fan_total_queue_size) | del(.response.configuration.fan_loading_queue_size) | del(.response.configuration.yahoo_total_queue_size) | del(.response.configuration.yahoo_loading_queue_size) | del(.response.configuration.min_minutes_between_sponsored_moments) | del(.response.configuration.rewarded_ad_timeout_seconds) | del(.response.configuration.vungle_ad_token_sync_seconds) | del(.response.configuration.static_interstitial_close_button_delay_seconds) | del(.response.configuration.video_interstitial_close_button_delay_seconds) | del(.response.configuration.static_interstitial_bid_floor_usd) | del(.response.configuration.video_interstitial_bid_floor_usd)'
+
+[MITM]
+hostname = %APPEND% api-http2.tumblr.com

@@ -1,0 +1,17 @@
+#!name=顺丰速运去广告
+#!desc=移除开屏广告、首页下拉抽屉、首页推广、应用内悬浮窗、横幅广告，移除主题，精简我的页面。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/SF-Express.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/ccsp-egmas\.sf-express\.com\/cx-app-base\/base\/app\/appHomeConfig\/query$ '.obj |= map(select(.position != 2))'
+
+[Map Local]
+(?i)^https:\/\/ccsp-egmas\.sf-express\.com\/cx-app-base\/base\/app\/ad\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/ucmp\.sf-express\.com\/proxy\/esgcempcore\/memberGoods\/pointMallService\/goodsList$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/ucmp(-static)?\.sf-express\.com\/proxy\/ccspBase\/module-config\/(login\/)?query\? data-type=base64 data="eyJ2ZXJzaW9uIjoiMi4wIiwic3VjY2VzcyI6dHJ1ZSwib2JqIjpbeyJwb3NpdGlvbk5hbWUiOiJBUFAyMDI1IiwicG9zaXRpb25DaGFubmVsIjoiYXBwIiwic2NlbmVMaXN0IjpbeyJ1cmxUeXBlIjoid2VidmlldyIsInNjZW5lQ29kZSI6ImRkY2IzNjI5NWQ1ZDI5MzliYTRiYmUyZTVlMDJhNGQ4IiwiZXh0ZW5kRmllbGQxIjoie1wiYm91bmRBcHBcIjpcIkFuZHJvaWQsaU9TXCJ9IiwiaWQiOjI5MTMwLCJleHRlbmRGaWVsZE9uZURUTyI6eyJib3VuZEFwcCI6IkFuZHJvaWQsaU9TIn0sInNlcSI6MCwic2NlbmVOYW1lIjoi5a+E5b+r6YCSIiwidXBkYXRlVGltZSI6IjIwMjYtMDItMDYgMTg6NTU6MTUiLCJ1cmwiOiJ7IFwibmVlZExvZ2luXCI6IHRydWUsIFwiY2xhc3NpZnlcIjogXCJNWV9TRVJWSUNFXCIsIFwicGFyYW1zXCI6IHsgXCJqdW1wTmFtZVwiOiBcIuW/q+mAn+WvhOS7tlw=" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% ccsp-egmas.sf-express.com, ucmp.sf-express.com, ucmp-static.sf-express.com

@@ -1,0 +1,25 @@
+#!name=斗鱼去广告
+#!desc=移除开屏、首页视频流、首页轮播图广告，移除直播间悬浮窗。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Douyu.png
+#!category=去广告
+
+[Rule]
+URL-REGEX, "^http:\/\/linkmicschedule\.douyucdn\.cn\/im_schedule\/im_gate_list", REJECT
+AND, ((DEST-PORT, 18000), (PROTOCOL, STUN)), REJECT
+DOMAIN, stun1.douyucdn.cn, REJECT
+DOMAIN, stun1.qvb.qcloud.com, REJECT
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/apiv2\.douyucdn\.cn\/japi\/entrance\/roomRes\/nc\/m\/list 'del(.data.pendant_a) | del(.data.entrance_d)'
+http-response-jq (?i)^https:\/\/venus\.douyucdn\.cn\/venus\/config\/static\/update.+keyCodeSet=flow_config '.greatGodGameSitterSwitch = 0 | .followMoreAnchorEntrance = 0 | .sdklivebanner = 0 | .homeActFloatSwitch = 0 | .bringGoodsSwitch = 0 | .qqGameSwitch = 0'
+
+[Map Local]
+(?i)^https:\/\/rtbapi\.douyucdn\.cn\/japi\/sign\/app\/getinfo data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[Script]
+Douyu_remove_ads · 移除首页轮播图和视频流广告 = type=http-response, pattern=(?i)^https:\/\/apiv2\.douyucdn\.cn\/mgapi\/livenc\/home\/getRecV3, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/Douyu/Douyu_remove_ads.js, requires-body=1, max-size=-1
+
+[MITM]
+hostname = %APPEND% rtbapi.douyucdn.cn, apiv2.douyucdn.cn, venus.douyucdn.cn

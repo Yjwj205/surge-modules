@@ -1,0 +1,32 @@
+#!name=DNS防泄露
+#!desc=专为小白设计的DNS防泄露
+#!author=非正常人类研究中心
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/Other_icon/120px/Prevent_DNS_Leaks.png
+#!category=DNS
+#!arguments=policy:PROXY
+#!arguments-desc=[policy] 策略
+
+[Rule]
+DOMAIN-SUFFIX, dnsleaktest.com,{{{policy}}}
+DOMAIN-SUFFIX, dnsleak.com,{{{policy}}}
+DOMAIN-SUFFIX, expressvpn.com,{{{policy}}}
+DOMAIN-SUFFIX, nordvpn.com,{{{policy}}}
+DOMAIN-SUFFIX, surfshark.com,{{{policy}}}
+DOMAIN-SUFFIX, ipleak.net,{{{policy}}}
+DOMAIN-SUFFIX, perfect-privacy.com,{{{policy}}}
+DOMAIN-SUFFIX, browserleaks.com,{{{policy}}}
+DOMAIN-SUFFIX, browserleaks.org,{{{policy}}}
+DOMAIN-SUFFIX, vpnunlimited.com,{{{policy}}}
+DOMAIN-SUFFIX, whoer.net,{{{policy}}}
+DOMAIN-SUFFIX, whrq.net,{{{policy}}}
+DOMAIN-SUFFIX, astrill.com,{{{policy}}}
+DOMAIN-SUFFIX, astrill.org,{{{policy}}}
+DOMAIN-SUFFIX, dnsleak.asn247.net,{{{policy}}}
+DOMAIN-SUFFIX, surfshark.com,{{{policy}}}
+DOMAIN-SUFFIX, surfsharkdns.com,{{{policy}}}
+DOMAIN-SUFFIX, pixelscan.net,{{{policy}}}
+DOMAIN, ipv4.ping0.cc,{{{policy}}}
+DOMAIN, ipv6.ping0.cc,{{{policy}}}
+DOMAIN-SUFFIX, ipapi.co,{{{policy}}}
+DOMAIN, ip-scan.adspower.net,{{{policy}}}

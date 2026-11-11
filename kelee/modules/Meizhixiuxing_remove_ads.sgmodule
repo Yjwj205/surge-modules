@@ -1,0 +1,21 @@
+#!name=美丽修行去广告
+#!desc=移除开屏广告、首页广告、发现页广告、美修盒页面广告、下拉广告、弹窗广告、搜索推广、版本更新弹窗及我的页面广告。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Meizhixiuxing.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/api\.bevol\.com\/appmain\/app\/home\/page$ 'del(.result.versionPopUp) | del(.result.isShowSearchLabel) | del(.result.isShowSearchFeedBack) | del(.result.centerBannerAdvert) | del(.result.programmaticAdvertising) | del(.result.mattsData) | del(.result.questionnaireMap) | del(.result.appPullDownAdvert)'
+http-response-jq (?i)^https:\/\/api\.bevol\.com\/appmain\/app\/home\/feed$ 'del(.result.banners)'
+http-response-jq (?i)^https:\/\/api\.bevol\.com\/appmain\/app\/home\/feed$ '. | .result.returnList |= (map(select(.tname == "userPart"))) | .result.returnList |= map(select(. | has("adId") | not))'
+http-response-jq (?i)^https:\/\/api\.bevol\.com\/trialbox\/shop\/app\/homePage$ 'del(.result.firstPersonActivity) | del(.result.mainActivity) | del(.result.brandZone) | del(.result.imageAD2) | del(.result.couponPopupInfo)'
+
+[Map Local]
+(?i)^https:\/\/api\.bevol\.com\/appmain\/app\/home\/launch$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api\.bevol\.com\/appmain\/app\/home\/popup$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api\.bevol\.com\/personal\/page$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api\.bevol\.com\/seach\/foundAndTopSearch$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% api.bevol.com

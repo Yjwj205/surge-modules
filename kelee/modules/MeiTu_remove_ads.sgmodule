@@ -1,0 +1,15 @@
+#!name=美图秀秀去广告
+#!desc=移除开屏广告、横幅推广，精简我的页面。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/MeiTu.png
+#!category=去广告
+
+[Rule]
+DOMAIN, adui.tg.meitu.com, REJECT
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/api\.posters\.meitu\.com\/common\/init\.json 'del(.data.vip)'
+
+[MITM]
+hostname = %APPEND% api.posters.meitu.com

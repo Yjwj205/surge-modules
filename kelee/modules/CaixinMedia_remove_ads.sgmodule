@@ -1,0 +1,24 @@
+#!name=财新去广告
+#!desc=过滤财新广告
+#!author=RuCu6[https://github.com/RuCu6]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/CaixinMedia.png
+#!category=去广告
+
+[Map Local]
+(?i)^https:\/\/entities\.caixin\.com\/api\/(dataplus\/promotionHints|public\/push\/appIndex|public\/recommendNews) data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gateway\.caixin\.com\/api\/app-api\/cxAdInfo\/selectIndexAdInfo data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/mappsv5\.caixin\.com\/channelv5\/article_ad_ios_info\.json data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/gg\.caixin\.com\/s\?z=caixin&slot=\d+ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/msgapi\.caixin\.com\/msg_api\/annmsg\/annlist data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[Script]
+CaixinMedia_remove_ads · 移除财新数据通广告 = type=http-response, pattern=(?i)^https:\/\/entities\.caixin\.com\/api\/dataplus\/columns, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/CaixinMedia/CaixinMedia_remove_ads.js, requires-body=1, max-size=-1
+CaixinMedia_remove_ads · 移除文末广告 = type=http-response, pattern=(?i)^https:\/\/gateway\.caixin\.com\/api\/app-api\/(caixinapp\/appinfo|search\/getkeyword), script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/CaixinMedia/CaixinMedia_remove_ads.js, requires-body=1, max-size=-1
+CaixinMedia_remove_ads · 移除财新FM广告 = type=http-response, pattern=(?i)^https:\/\/gateway\.caixin\.com\/api\/app-content\/fm\/index\/list\?, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/CaixinMedia/CaixinMedia_remove_ads.js, requires-body=1, max-size=-1
+CaixinMedia_remove_ads · 移除开屏广告 = type=http-response, pattern=(?i)^https:\/\/gg\.caixin\.com\/s\?z=caixin&op=\d, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/CaixinMedia/CaixinMedia_remove_ads.js, requires-body=1, max-size=-1
+CaixinMedia_remove_ads · 移除正文广告 = type=http-response, pattern=(?i)^https:\/\/mappsv5\.caixin\.com\/articlev5\/\d+\/\d+\.json$, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/CaixinMedia/CaixinMedia_remove_ads.js, requires-body=1, max-size=-1
+CaixinMedia_remove_ads · 移除正文广告 #2 = type=http-response, pattern=(?i)^https:\/\/mapps?v5\.caixin\.com\/(channelv5\/list|\/?index_page_v5\/)\w+, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/CaixinMedia/CaixinMedia_remove_ads.js, requires-body=1, max-size=-1
+
+[MITM]
+hostname = %APPEND% e*.caixin.com, g*.caixin.com, m*.caixin.com

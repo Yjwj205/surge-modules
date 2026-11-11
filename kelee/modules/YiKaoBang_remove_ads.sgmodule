@@ -1,0 +1,13 @@
+#!name=医考帮去广告
+#!desc=移除横幅推广、弹窗、首页悬浮挂件。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YiKaoBang.png
+#!category=去广告
+
+[Map Local]
+(?i)^https:\/\/api\.yikaobang\.com\.cn\/index\.php\/client\/main\/ads\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api\.yikaobang\.com\.cn\/index\.php\/client\/Main\/startPage\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% api.yikaobang.com.cn

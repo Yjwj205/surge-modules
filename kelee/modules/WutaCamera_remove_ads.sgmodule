@@ -1,0 +1,13 @@
+#!name=无他相机去广告
+#!desc=移除开屏广告、拍摄页面广告、右小角广告，精简底栏。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/WutaCamera.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/api-release\.wuta-cam\.com\/ad_tree$ 'del(.regular.splash) | del(.big_day) | del(.big_day_overrides) | del(.regular.home_bottom_right_entry_v2) | del(.regular.pic_upload_alert) | del(.regular.retouching_before_icon)'
+http-response-jq (?i)^https:\/\/api-release\.wuta-cam\.com\/ad_tree$ '.regular.homepage_25_bottom_nav_bar|=map(.button_list|=map(select(.name|IN("home","me"))))'
+
+[MITM]
+hostname = %APPEND% api-release.wuta-cam.com

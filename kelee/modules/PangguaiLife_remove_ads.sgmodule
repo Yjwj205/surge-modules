@@ -1,0 +1,21 @@
+#!name=胖乖生活去广告
+#!desc=移除开屏广告、横幅轮播图、网格广告、信息流广告、浮窗广告，精简我的页面。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/PangguaiLife.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/userapi\.qiekj\.com\/local-life\/tab-order$ '.data = []'
+http-response-jq (?i)^https:\/\/userapi\.qiekj\.com\/integralGoods\/queryIntegralGoodsCategoryList$ '.data = []'
+
+[Map Local]
+(?i)^https:\/\/userapi\.qiekj\.com\/slot\/get$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/userapi\.qiekj\.com\/appTitle\/get$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/userapi\.qiekj\.com\/integralRecord\/integralDailStatistics$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/userapi\.qiekj\.com\/local-life\/category$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/userapi\.qiekj\.com\/integralGoods\/queryIntegralGoodsPage$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/userapi\.qiekj\.com\/task\/list$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% userapi.qiekj.com

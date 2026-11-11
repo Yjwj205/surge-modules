@@ -1,0 +1,16 @@
+#!name=收银通商户端去广告
+#!desc=移除开屏广告和首页推广
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/ShouYinTongMerchant.png
+#!category=去广告
+
+[Map Local]
+(?i)^https:\/\/syt\.leshuazf\.com\/merchant\/merchant\/showOpenScreenAd$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/m\.fqfin\.cn\/cls\/leshuapay\/preCredit\.json$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/syt\.leshuazf\.com\/merchant\/messageCenter\/stationLetterList$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/syt\.leshuazf\.com\/merchant\/merchant\/getBannerConfig$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/syt\.leshuazf\.com\/merchant\/popup\/getPopupInfo$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% syt.leshuazf.com, m.fqfin.cn

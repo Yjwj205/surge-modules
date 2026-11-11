@@ -1,0 +1,16 @@
+#!name=阅友去广告
+#!desc=移除开屏广告、弹窗广告和阅读页面广告，移除底栏福利按钮。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Yueyou.png
+#!category=去广告
+
+[Rule]
+DOMAIN, ads.reader.yueyouxs.com, REJECT
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/goway\.reader\.yueyouxs\.com\/assemble\/app\/basic\/getAppInfo\? 'del(.data.isShowDLPopup) | del(.data.isShowGame) | del(.data.touTiaoShowDlPopup) | del(.data.offLineDownload.WatchVideoBtnDesc) | del(.data.readVipFirstCfg) | del(.data.readVipNormalCfg) | del(.data.notifyAd) | del(.data.hotStartSplashTime) | del(.data.hotStartReqSwitch) | del(.data.isShowBFTab) | del(.data.popReqDelayTime) | del(.data.benefitCfg) | del(.data.chestTask) | del(.data.hotStartAd) | del(.data.activeTagList) | del(.data.secondOrderCfg) | del(.data.secondOrderList) | del(.data.blockedWordsCfg) | del(.data.aaReportListCfg) | del(.data.pddAdSwitch) | del(.data.isShowShelfAuthPopup) | del(.data.firstPopUpAmount)'
+http-response-jq (?i)^https:\/\/goway\.reader\.yueyouxs\.com\/assemble\/app\/basic\/getAppInfo\? '.data.isAdClosed = true'
+
+[MITM]
+hostname = %APPEND% goway.reader.yueyouxs.com

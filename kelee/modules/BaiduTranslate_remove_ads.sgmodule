@@ -1,0 +1,17 @@
+#!name=百度翻译去广告
+#!desc=移除开屏广告、横幅广告，精简我的页面。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/BaiduTranslate.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/fanyi-app\.baidu\.com\/transapp\/comment\/my\? 'del(.data.taskBanner) | del(.data.act)'
+http-response-jq (?i)^https:\/\/fanyi-app\.baidu\.com\/transapp\/recitewd\/myplan\? 'del(.data.activityRec) | del(.data.activityRecList)'
+
+[Map Local]
+(?i)^https:\/\/fanyi-app\.baidu\.com\/transapp\/v2\/api\/launch\/config\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/fanyi-app\.baidu\.com\/static\/react-activity\/page\/courseBoutique\.html\? data-type=text data="" status-code=404
+
+[MITM]
+hostname = %APPEND% fanyi-app.baidu.com

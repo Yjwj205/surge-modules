@@ -1,0 +1,25 @@
+#!name=百度文库去广告
+#!desc=移除开屏广告、横幅广告、弹窗广告、信息流推广、搜索发现、热门搜索、资料库搜索推荐，精简我的页面。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/BaiduWenku.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/appwk\.baidu\.com\/appapi\/index\/home\? 'del(.data.bannerInfo) | del(.data.bannerList) | del(.data.bannerListV2)'
+http-response-jq (?i)^https:\/\/(appwk|tanbi)\.baidu\.com\/gsula\/sula\/syncmrecall$ 'del(.data.items)'
+http-response-jq (?i)^https:\/\/appwk\.baidu\.com\/appapi\/index\/tab\? 'del(.data)'
+http-response-jq (?i)^https:\/\/appwk\.baidu\.com\/appapi\/forum\/feed\?reqMode=wenkuapp_main_feed 'del(.data)'
+
+[Map Local]
+(?i)^https:\/\/appwk\.baidu\.com\/xpage\/interface\/wknaad\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appwk\.baidu\.com\/appapi\/search\/hot\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appwk\.baidu\.com\/naapi\/search\/wkhotwords\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appwk\.baidu\.com\/appapi\/task\/viptasklist\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appwk\.baidu\.com\/activity\/interface\/wkapppopup\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appwk\.baidu\.com\/appapi\/abg\/index\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appwk\.baidu\.com\/naapi\/recommend\/recommenddoc\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/appwk\.baidu\.com\/naapi\/recommend\/vipdoccard\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% appwk.baidu.com, tanbi.baidu.com

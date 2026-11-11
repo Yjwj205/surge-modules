@@ -1,0 +1,21 @@
+#!name=网易有道词典去广告
+#!desc=移除开屏广告、弹窗广告、右上角推广。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YoudaoDict.png
+#!category=去广告
+
+[Rule]
+DOMAIN, ad-sdk-config.youdao.com, REJECT,pre-matching
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/dict\.youdao\.com\/homepage\/toolbar\/get\/ 'del(.data.vipTag)'
+
+[Map Local]
+(?i)^https:\/\/dict\.youdao\.com\/vip\/activity\/startup\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/dict\.youdao\.com\/vip\/activity\/retention\/configs\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/dict\.youdao\.com\/vip\/activity\/retention\/match\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/dict\.youdao\.com\/vip\/user\/paid\/guide\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% dict.youdao.com

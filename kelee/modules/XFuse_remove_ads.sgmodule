@@ -1,0 +1,12 @@
+#!name=磁力宅播放器去广告
+#!desc=移除开屏广告、弹窗和文件列表广告。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/XFuse.png
+#!category=去广告
+
+[Map Local]
+(?i)^https:\/\/cili\.xfuse\.fun\/s\/ data-type=text data="" status-code=404
+
+[MITM]
+hostname = %APPEND% cili.xfuse.fun, i.micecube.com, img.mofyi.com

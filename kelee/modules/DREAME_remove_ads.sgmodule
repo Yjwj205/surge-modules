@@ -1,0 +1,18 @@
+#!name=DREAME去广告
+#!desc=移除开屏广告、首页大图推广、横幅推广，精简底栏，阻止桌面图标替换。仅支持2.5.1版。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/DREAME.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/cn\.iot\.dreame\.tech:13267\/dreame-system\/dreame-app\/setting\/query$ 'del(.data.appIconConfig)'
+
+[Map Local]
+(?i)^https:\/\/cn\.iot\.dreame\.tech:\d+\/dreame-product\/public\/advertisement\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/cn-mall\.dreame\.tech\/dreame-mall\/api\/v1\/tag\/list$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/cn-wxmall\.dreame\.tech\/main\/goods\/get-topgoods$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/cn\.iot\.dreame\.tech:\d+\/dreame-product\/public\/common-plugin$ data-type=base64 data="eyJjb2RlIjowLCJzdWNjZXNzIjp0cnVlLCJkYXRhIjp7InZlcnNpb24iOjExNDQsImFwcFZlciI6MjAsInVybCI6Imh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9ZandqMjA1L2xvb24ta2VsZWUtYXJjaGl2ZS9tYWluL3Jlc291cmNlcy9SZXNvdXJjZS9aaXAvRFJFQU1FL2Q2OTk2ZmVlOTUzODBhZmZkZjc0MGVlNDRhODVmYmU5X19fVU5JX19FREI5MjJFLnppcCIsIm1kNSI6ImUwY2M5Y2I3N2Q5ZTBjZjI3NWU0MWU3M2RiYTNmOTg4IiwidmFsaWREYXRlIjoiIiwiY2hhbmdlTG9nIjoiIiwic3RhdHVzIjoiIn0sIm1zZyI6IuaTjeS9nOaIkOWKnyJ9" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% cn-mall.dreame.tech, cn-wxmall.dreame.tech, cn.iot.dreame.tech

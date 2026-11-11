@@ -1,0 +1,19 @@
+#!name=堆糖去广告
+#!desc=移除开屏广告、信息流广告、热搜排行榜广告、我的页面横幅广告，移除关注推荐，精简底部导航栏。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/DuiTang.png
+#!category=去广告
+
+[Body Rewrite]
+http-response-jq (?i)^https:\/\/meta\.duitang\.com\/napi\/infra\/settings\/ 'del(.data.AD_LINKS)'
+http-response-jq (?i)^https:\/\/(www|api-2)\.duitang\.com\/napi\/home\/bottom_tab\/detail\/\? '.data.tabs |= map(select(.group == "home" or .group == "category" or .group == "me"))'
+http-response-jq (?i)^https:\/\/api-2\.duitang\.com\/napi\/settings\/ 'del(.data.SPLASH_SWING_OPEN) | del(.data.STICKER_SEARCH_HOT_KEYWORDS) | del(.data.REWARD_AD_PAG_EDITOR) | del(.data.REWARD_AD_PHOTO_EDITOR) | del(.data.REWARD_AD_CUTOUT_NUM) | del(.data.MAIN_EVENTS) | del(.data.QA_TOOLTIP_BOTTOM) | del(.data.OC_FOLLOW_OFFICIAL) | del(.data.AD_MENU_SELECTIONS) | del(.data.FEATURE_TEMPLATES) | del(.data.FEEDBACK_URL) | del(.data.AVATAR_MALL_UPDATE) | del(.data.WATERMARK_MALL_UPDATE) | del(.data.OC_MALL_UPDATE) | del(."data[\"3D_AVATAR_UPDATE\"]") | del(.data.BENEFIT_LIST) | del(.data.SHARE_BANNER)'
+
+[Map Local]
+(?i)^https:\/\/xapi\.duitang\.com\/napi\/ads\/\? data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/api-2\.duitang\.com\/napi\/vienna\/daren\/daren\/recommend\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/www\.duitang\.com\/napi\/hot\/search\/list\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% www.duitang.com, api-2.duitang.com, meta.duitang.com

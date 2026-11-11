@@ -1,0 +1,15 @@
+#!name=马克水印相机去广告
+#!desc=移除开屏广告，拍摄首页悬浮挂件，侧边栏横幅广告。
+#!author=可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
+#!homepage=https://hub.kelee.one
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/marki.png
+#!category=去广告
+
+[Map Local]
+(?i)^https:\/\/marki\.markiapp\.com\/mkg\/MomStats\/getFlowWindowList$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https?:\/\/marki\.markiapp\.com\/mkg\/Advertising\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/marki\.markiapp\.com\/mkg\/MomStats\/getIntegralAdv$ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+(?i)^https:\/\/market-callback\.markiapp\.com\/adcenter\/ data-type=text data="{}" header="Content-Type:application/json" status-code=200
+
+[MITM]
+hostname = %APPEND% marki.markiapp.com, market-callback.markiapp.com
