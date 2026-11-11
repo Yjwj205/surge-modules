@@ -85,15 +85,29 @@ try {
     } catch (e) {}
   }
 
+  // 反馈节流：10 分钟内只提示一次，避免刷屏
+  function notice(text) {
+    var KEY = "ikuuu_capture_notice_ts";
+    var now = Date.now();
+    try {
+      var last = Number($persistentStore.read(KEY) || 0);
+      if (now - last < 600000) return;
+      $persistentStore.write(String(now), KEY);
+    } catch (e) {}
+    notify(text, "在 Safari 登录 ikuuu.org 后再刷新一次即可；也可以在模块参数里直接粘贴 Cookie。");
+  }
+
   if (!cookie) {
     console.log("[iKuuu] 本次请求没有 Cookie，跳过");
     markState("请求里没有 Cookie（可能未登录）");
+    notice("抓到了 ikuuu 请求，但没有 Cookie");
     return $done({});
   }
 
   if (!LOGIN_COOKIE.test(cookie)) {
     console.log("[iKuuu] 当前是未登录状态，忽略本次 Cookie");
     markState("未登录（游客 Cookie，已忽略）");
+    notice("抓到的是游客 Cookie，未登录");
     return $done({});
   }
 

@@ -26,7 +26,11 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 1. 保持 `capture=true` → Safari 打开 `https://ikuuu.org` 登录一次 → 抓取成功后可在模块参数里把 `capture` 改成 `false`；
 2. 或在 `cookie` 参数里直接粘贴（支持带 `Cookie:` 前缀）。
 
-**手动签到**：首页面板「iKuuu 手动签到」点一下即可（`update-interval=-1`，不会自动刷新）。
+**手动签到 / 状态**：首页面板里
+- 「iKuuu 手动签到」→ 立即执行一次签到
+- 「iKuuu 抓取状态」→ 显示 Cookie 是否已保存、抓取脚本最近一次运行时间与结果
+
+抓取脚本现在会在「抓到请求但没有 Cookie / 只有游客 Cookie」时也发一条通知（10 分钟限一次），方便判断是没登录还是压根没触发。
 
 ---
 
@@ -45,6 +49,10 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 | `RANDOM_REWARD` | `false` | 随机奖励模式 |
 
 **首次使用**：保持 `ENABLE_CAPTURE=true` → Safari 打开 `https://www.nodeseek.com` 并登录，触发一次 `getInfo` 请求即可自动保存 Cookie，之后可关闭抓取。
+
+**手动签到 / 状态**：首页面板
+- 「NodeSeek 手动签到」→ 立即执行一次签到（原插件只有定时任务，这里补了手动入口）
+- 「NodeSeek 抓取状态」→ 显示 Cookie 与抓取记录
 
 ---
 
