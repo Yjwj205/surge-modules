@@ -7,6 +7,7 @@ Surge 模块与脚本合集。
 | 目录 | 内容 |
 |---|---|
 | [`kelee/`](kelee/README.md) | 可莉（kelee.one）Loon 插件中心 275 个插件全量转换的 Surge 模块 |
+| [`checkin/`](checkin/README.md) | iKuuu 每日签到、NodeSeek 签到增强版（Loon 签到插件转 Surge） |
 | 根目录 | 网络状态面板等自用模块（`net-status.*`） |
 
 ## kelee/ 模块
