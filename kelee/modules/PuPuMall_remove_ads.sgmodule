@@ -11,11 +11,11 @@
 
 [Script]
 PuPuMall_remove_ads · 移除朴朴超市广告 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/marketing\/banner\/v7, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
-PuPuMall_remove_ads · 移除朴朴超市广告 #2 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/marketing\/banner\/search_component_banner, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
-PuPuMall_remove_ads · 移除朴朴超市广告 #3 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/search\/hot_keywords\/v3, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
-PuPuMall_remove_ads · 移除朴朴超市广告 #4 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/app_resource\/resource_preload\/list_h5_resource, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
-PuPuMall_remove_ads · 移除朴朴超市广告 #5 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/recommendation\/interests\/products, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
-PuPuMall_remove_ads · 移除朴朴超市广告 #6 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/marketing\/advertisement\/v1, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
+PuPuMall_remove_ads · 移除朴朴超市广告-2 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/marketing\/banner\/search_component_banner, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
+PuPuMall_remove_ads · 移除朴朴超市广告-3 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/search\/hot_keywords\/v3, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
+PuPuMall_remove_ads · 移除朴朴超市广告-4 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/app_resource\/resource_preload\/list_h5_resource, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
+PuPuMall_remove_ads · 移除朴朴超市广告-5 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/recommendation\/interests\/products, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
+PuPuMall_remove_ads · 移除朴朴超市广告-6 = type=http-response, pattern=(?i)^https:\/\/j1\.pupuapi\.com\/client\/marketing\/advertisement\/v1, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/PuPuMall/PuPuMall_remove_ads.js, requires-body=1, max-size=-1
 
 [MITM]
 hostname = %APPEND% j1.pupuapi.com
