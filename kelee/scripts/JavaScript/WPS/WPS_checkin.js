@@ -1,3 +1,9 @@
+/* surge-adapter: 模块参数默认哨兵 none 视为空值 */
+try {
+  if (typeof $argument === "string" && $argument.indexOf("=none") !== -1) {
+    $argument = $argument.replace(/(^|&)([^=&]+)=none(?=&|$)/g, "$1$2=");
+  }
+} catch (e) {}
 /*
 脚本作者：小白脸
 更新时间：2024-10-13 17:59:33

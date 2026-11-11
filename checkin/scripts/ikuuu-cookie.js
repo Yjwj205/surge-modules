@@ -1,3 +1,9 @@
+/* surge-adapter: 模块参数默认哨兵 none 视为空值 */
+try {
+  if (typeof $argument === "string" && $argument.indexOf("=none") !== -1) {
+    $argument = $argument.replace(/(^|&)([^=&]+)=none(?=&|$)/g, "$1$2=");
+  }
+} catch (e) {}
 /**
  * iKuuu Cookie 抓取（Loon http-request 脚本）
  *

@@ -4,7 +4,7 @@
 #!homepage=https://hub.kelee.one
 #!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/AppleWeather.png
 #!category=功能增强
-#!arguments=Weather_Provider:ColorfulClouds,NextHour_Provider:ColorfulClouds,AirQuality_Calculate_Algorithm:EU_EAQI,API_ColorfulClouds_Token,API_QWeather_Host:devapi.qweather.com,API_QWeather_Token,API_WAQI_Token,Storage:Argument,LogLevel:WARN
+#!arguments=Weather_Provider:ColorfulClouds,NextHour_Provider:ColorfulClouds,AirQuality_Calculate_Algorithm:EU_EAQI,API_ColorfulClouds_Token:none,API_QWeather_Host:devapi.qweather.com,API_QWeather_Token:none,API_WAQI_Token:none,Storage:Argument,LogLevel:WARN
 #!arguments-desc=[Weather_Provider] [天气]数据源 / [NextHour_Provider] [未来一小时降水强度]数据源 / [AirQuality_Calculate_Algorithm] AQI算法 / [API_ColorfulClouds_Token] [API]彩云天气令牌 / [API_QWeather_Host] [API]和风天气主机 / [API_QWeather_Token] [API]和风天气令牌 / [API_WAQI_Token] [API]WAQI令牌 / [Storage] [储存]配置类型 / [LogLevel] [调试]日志等级
 
 [Rule]

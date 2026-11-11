@@ -4,11 +4,11 @@
 #!homepage=https://github.com/luestr/ProxyResource/blob/main/Resource/Markdown/FollowRSS/README.md
 #!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/FollowRSS.png
 #!category=签到
-#!arguments=token,cookie,cron:0 1 * * *
+#!arguments=token:none,cookie:none,cron:0 1 * * *
 #!arguments-desc=[token] csrfToken / [cookie] Cookie / [cron] 定时参数
 
 [Script]
-FollowRSS_checkin · Follow每日签到 = type=cron, cronexp="{{cron}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/FollowRSS/FollowRSS_checkin.js, argument="token={{{token}}}&cookie={{{cookie}}}", timeout=120
+FollowRSS_checkin · Follow每日签到 = type=cron, cronexp="{{{cron}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/FollowRSS/FollowRSS_checkin.js, argument="token={{{token}}}&cookie={{{cookie}}}", timeout=120
 
 [MITM]
 hostname = %APPEND% api.follow.is

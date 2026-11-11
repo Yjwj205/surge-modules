@@ -1,3 +1,9 @@
+/* surge-adapter: 模块参数默认哨兵 none 视为空值 */
+try {
+  if (typeof $argument === "string" && $argument.indexOf("=none") !== -1) {
+    $argument = $argument.replace(/(^|&)([^=&]+)=none(?=&|$)/g, "$1$2=");
+  }
+} catch (e) {}
 // ================= 全局参数解析区 =================
 let checkinCookie = "";
 let tgToken = "";
@@ -22,6 +28,7 @@ if (typeof $argument !== "undefined" && $argument) {
                     catch (e) { o[p.slice(0, i)] = p.slice(i + 1); }
                 }
             });
+            Object.keys(o).forEach((k) => { if (o[k] === "none" || o[k] === "undefined") o[k] = ""; });
             return o;
         };
         const arg = typeof $argument === "string" ? parseArg($argument) : $argument;

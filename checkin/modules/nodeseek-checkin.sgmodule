@@ -4,7 +4,7 @@
 #!homepage=https://github.com/Roddy-D/Loon_plugins
 #!icon=https://raw.githubusercontent.com/Roddy-D/Loon_plugins/refs/heads/main/icon/nscheckin.png
 #!category=签到
-#!arguments=CRON_TIME:1 0 * * *,ENABLE_CAPTURE:true,NS_COOKIE,TG_BOT_TOKEN,TG_USER_ID,TG_NOTIFY_ONLY_FAIL:false,RANDOM_REWARD:false
+#!arguments=CRON_TIME:1 0 * * *,ENABLE_CAPTURE:true,NS_COOKIE:none,TG_BOT_TOKEN:none,TG_USER_ID:none,TG_NOTIFY_ONLY_FAIL:false,RANDOM_REWARD:false
 #!arguments-desc=[CRON_TIME] 签到执行时间（5 段 cron） / [ENABLE_CAPTURE] 打开后在 NodeSeek 页面可自动抓取 Cookie / [NS_COOKIE] Cookie，抓取后自动保存在本地，也可手动粘贴 / [TG_BOT_TOKEN] 选填，Telegram Bot Token / [TG_USER_ID] 选填，接收消息的 User ID / [TG_NOTIFY_ONLY_FAIL] 仅失败时推送 TG / [RANDOM_REWARD] 随机奖励模式
 
 [Script]

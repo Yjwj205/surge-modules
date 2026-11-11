@@ -1,3 +1,9 @@
+/* surge-adapter: 模块参数默认哨兵 none 视为空值 */
+try {
+  if (typeof $argument === "string" && $argument.indexOf("=none") !== -1) {
+    $argument = $argument.replace(/(^|&)([^=&]+)=none(?=&|$)/g, "$1$2=");
+  }
+} catch (e) {}
 /**
  * iKuuu 自动签到（Loon cron / generic 脚本）
  *
@@ -35,6 +41,7 @@
       try { o[decodeURIComponent(p.slice(0, i))] = decodeURIComponent(p.slice(i + 1)); }
       catch (e) { o[p.slice(0, i)] = p.slice(i + 1); }
     });
+    Object.keys(o).forEach(function (k) { if (o[k] === "none" || o[k] === "undefined") o[k] = ""; });
     return o;
   }
   var args = parseArgs(typeof $argument !== "undefined" ? $argument : "");
