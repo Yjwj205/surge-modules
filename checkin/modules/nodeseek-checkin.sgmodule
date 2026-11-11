@@ -8,15 +8,13 @@
 #!arguments-desc=[CRON_TIME] 签到执行时间（5 段 cron） / [ENABLE_CAPTURE] 打开后在 NodeSeek 页面可自动抓取 Cookie / [NS_COOKIE] Cookie，抓取后自动保存在本地，也可手动粘贴 / [TG_BOT_TOKEN] 选填，Telegram Bot Token / [TG_USER_ID] 选填，接收消息的 User ID / [TG_NOTIFY_ONLY_FAIL] 仅失败时推送 TG / [RANDOM_REWARD] 随机奖励模式
 
 [Script]
-NodeSeek-CookieCapture = type=http-request, pattern=^https:\/\/www\.nodeseek\.com\/api\/account\/getInfo\/, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, script-update-interval=600, argument="ENABLE_CAPTURE={{{ENABLE_CAPTURE}}}", requires-body=0, max-size=0
-NodeSeek-Checkin = type=cron, cronexp="{{{CRON_TIME}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, script-update-interval=600, argument="NS_COOKIE={{{NS_COOKIE}}}&TG_BOT_TOKEN={{{TG_BOT_TOKEN}}}&TG_USER_ID={{{TG_USER_ID}}}&TG_NOTIFY_ONLY_FAIL={{{TG_NOTIFY_ONLY_FAIL}}}&RANDOM_REWARD={{{RANDOM_REWARD}}}", timeout=60, wake-system=1
+NodeSeek-CookieCapture = type=http-request, pattern=^https:\/\/www\.nodeseek\.com\/api\/account\/getInfo\/, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, argument="ENABLE_CAPTURE={{{ENABLE_CAPTURE}}}", requires-body=0, max-size=0
+NodeSeek-Checkin = type=cron, cronexp="{{{CRON_TIME}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, argument="NS_COOKIE={{{NS_COOKIE}}}&TG_BOT_TOKEN={{{TG_BOT_TOKEN}}}&TG_USER_ID={{{TG_USER_ID}}}&TG_NOTIFY_ONLY_FAIL={{{TG_NOTIFY_ONLY_FAIL}}}&RANDOM_REWARD={{{RANDOM_REWARD}}}", timeout=60, wake-system=1
 
-NodeSeek-CheckinManual = type=generic, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, script-update-interval=600, argument="NS_COOKIE={{{NS_COOKIE}}}&TG_BOT_TOKEN={{{TG_BOT_TOKEN}}}&TG_USER_ID={{{TG_USER_ID}}}&TG_NOTIFY_ONLY_FAIL={{{TG_NOTIFY_ONLY_FAIL}}}&RANDOM_REWARD={{{RANDOM_REWARD}}}", timeout=60
-NodeSeek-Status = type=generic, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/checkin-status.js, script-update-interval=600, argument="target=ns", timeout=10
+NodeSeek-CheckinManual = type=generic, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, argument="NS_COOKIE={{{NS_COOKIE}}}&TG_BOT_TOKEN={{{TG_BOT_TOKEN}}}&TG_USER_ID={{{TG_USER_ID}}}&TG_NOTIFY_ONLY_FAIL={{{TG_NOTIFY_ONLY_FAIL}}}&RANDOM_REWARD={{{RANDOM_REWARD}}}", timeout=60
 
 [Panel]
 NodeSeek 手动签到 = script-name=NodeSeek-CheckinManual, update-interval=-1
-NodeSeek 抓取状态 = script-name=NodeSeek-Status, update-interval=-1
 
 [MITM]
 hostname = %APPEND% www.nodeseek.com

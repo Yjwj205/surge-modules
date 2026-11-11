@@ -91,7 +91,6 @@ try {
           var ok2 = false;
           try { ok2 = $persistentStore.write(line, COOKIE_KEY); } catch (e) {}
           if (ok2) {
-            try { $persistentStore.write(JSON.stringify({ t: Date.now(), result: "登录响应中已保存 Cookie" }), "ikuuu_capture_state"); } catch (e) {}
             notify("已获取登录 Cookie", "登录成功，Cookie 已保存。可以在模块里把「抓取 Cookie」关掉了。");
           }
         }
@@ -111,11 +110,6 @@ try {
     console.log("[iKuuu] 读取请求头失败：" + e);
   }
 
-  function markState(result) {
-    try {
-      $persistentStore.write(JSON.stringify({ t: Date.now(), result: result }), "ikuuu_capture_state");
-    } catch (e) {}
-  }
 
   // 反馈节流：10 分钟内只提示一次，避免刷屏
   function notice(text) {
@@ -131,14 +125,12 @@ try {
 
   if (!cookie) {
     console.log("[iKuuu] 本次请求没有 Cookie，跳过");
-    markState("请求里没有 Cookie（可能未登录）");
     notice("抓到了 ikuuu 请求，但没有 Cookie");
     return $done({});
   }
 
   if (!LOGIN_COOKIE.test(cookie)) {
     console.log("[iKuuu] 当前是未登录状态，忽略本次 Cookie");
-    markState("未登录（游客 Cookie，已忽略）");
     notice("抓到的是游客 Cookie，未登录");
     return $done({});
   }
@@ -161,7 +153,6 @@ try {
   }
 
   if (saved) {
-    markState("已保存 Cookie");
     console.log("[iKuuu] 已保存登录 Cookie（" + cookie.length + " 字节）");
     notify("已获取登录 Cookie",
       "可以在插件里把「抓取 Cookie」开关关掉了，签到会继续使用这份 Cookie。");

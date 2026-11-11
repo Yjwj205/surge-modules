@@ -85,12 +85,8 @@ function handleCaptureCookie() {
 
     const cookie = getHeader("Cookie") || getHeader("cookie");
 
-    function markState(result) {
-        try { $persistentStore.write(JSON.stringify({ t: Date.now(), result: result }), "ns_capture_state"); } catch (e) {}
-    }
 
     if (!cookie) {
-        markState("请求里没有 Cookie（可能未登录）");
         console.log("[NS签到] ⚠️ 提取 Cookie 为空，原始全量Header为: " + JSON.stringify(allHeaders));
         $notification.post("NS Cookie 获取失败", "", "未能从请求中找到 Cookie，请检查抓包逻辑重新访问个人页面尝试。");
     } else {
@@ -115,7 +111,6 @@ function handleCaptureCookie() {
         }
 
         if (success) {
-            markState("已保存 Cookie");
             console.log("[NS签到] ✨ 成功保存 Cookie: " + cookie.substring(0, 30) + "...");
             $notification.post("NS Cookie 获取成功", "", `Cookie 已保存。\nSession 预计过期时间：${expiryDateStr}\n请前往插件关闭【抓取开关】。`);
         } else {
@@ -196,6 +191,16 @@ async function processResponse(resp) {
     }
 
     const content = msg || body.substring(0, 150) || "服务端未返回任何有效内容";
+
+    // NodeSeek 对重复签到返回 500 + 「今天已完成签到，请勿重复操作」，按成功处理
+    if (/已完成签到|已经签到|已签到|重复操作|请勿重复/.test(content)) {
+        console.log(`[NS签到] ✅ 今日已签到: ${content}`);
+        $notification.post("NS活动签到", "✅ 今日已签到", content);
+        if (!notifyOnlyFail) {
+            await sendTgNotify(`<b>✅ NodeSeek 今日已签到</b>\n\n返回信息：\n<code>${escapeHtml(content)}</code>`);
+        }
+        return;
+    }
 
     if (status >= 200 && status < 300) {
         const notifyStr = msg || "您已签到成功或已经签过到了";
