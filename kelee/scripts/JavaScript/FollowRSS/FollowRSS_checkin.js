@@ -1,17 +1,30 @@
-/* surge-adapter: 模块参数默认哨兵 none 视为空值 */
-try {
-  if (typeof $argument === "string" && $argument.indexOf("=none") !== -1) {
-    $argument = $argument.replace(/(^|&)([^=&]+)=none(?=&|$)/g, "$1$2=");
+/* surge-adapter: Surge 的 $argument 是字符串，转成对象供脚本按 Loon 语义读取 */
+var __arg = (function () {
+  var raw = (typeof $argument === 'string') ? $argument : '';
+  var o = {};
+  if (raw) {
+    raw.split('&').forEach(function (p) {
+      var i = p.indexOf('=');
+      if (i <= 0) return;
+      var k, v;
+      try { k = decodeURIComponent(p.slice(0, i)); v = decodeURIComponent(p.slice(i + 1)); }
+      catch (e) { k = p.slice(0, i); v = p.slice(i + 1); }
+      if (v === 'none' || v === 'undefined') v = '';
+      else if (v === 'true') v = true; else if (v === 'false') v = false;
+      else if (/^-?\d+(\.\d+)?$/.test(v)) v = Number(v);
+      o[k] = v;
+    });
   }
-} catch (e) {}
+  return o;
+})();
 /*
 脚本引用 https://github.com/chavyleung/scripts/blob/master/follow/follow.js
 */
 const $ = new Env('Follow每日签到')
 $.desc = []
 
-const csrfToken = $argument.token
-const cookie = $argument.cookie
+const csrfToken = __arg.token
+const cookie = __arg.cookie
 
 !(async () => {
   await sign()

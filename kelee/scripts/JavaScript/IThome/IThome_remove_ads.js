@@ -1,3 +1,22 @@
+/* surge-adapter: Surge 的 $argument 是字符串，转成对象供脚本按 Loon 语义读取 */
+var __arg = (function () {
+  var raw = (typeof $argument === 'string') ? $argument : '';
+  var o = {};
+  if (raw) {
+    raw.split('&').forEach(function (p) {
+      var i = p.indexOf('=');
+      if (i <= 0) return;
+      var k, v;
+      try { k = decodeURIComponent(p.slice(0, i)); v = decodeURIComponent(p.slice(i + 1)); }
+      catch (e) { k = p.slice(0, i); v = p.slice(i + 1); }
+      if (v === 'none' || v === 'undefined') v = '';
+      else if (v === 'true') v = true; else if (v === 'false') v = false;
+      else if (/^-?\d+(\.\d+)?$/.test(v)) v = Number(v);
+      o[k] = v;
+    });
+  }
+  return o;
+})();
 // 2025-10-24 03:22:31
 
 (() => {
@@ -14,8 +33,8 @@
     }
 
     // 获取参数值
-    const removeAllBanners = $argument?.removeAllBanners !== undefined ? $argument.removeAllBanners : true;
-    const removePinnedArticles = $argument?.removePinnedArticles !== undefined ? $argument.removePinnedArticles : true;
+    const removeAllBanners = __arg?.emoveAllBanners !== undefined ? __arg.removeAllBanners : true;
+    const removePinnedArticles = __arg?.emovePinnedArticles !== undefined ? __arg.removePinnedArticles : true;
     
     // 移除全部横幅
     const removeAllBannersFunc = () => {
