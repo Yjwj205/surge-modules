@@ -3,7 +3,7 @@
 #!author=Yjwj205 / Minis
 #!homepage=https://github.com/Yjwj205/loon-modules
 #!category=签到
-#!arguments=cookie:,capture:true,notify:true,cronExpr:0 8 * * *
+#!arguments=cookie,capture:true,notify:true,cronExpr:0 8 * * *
 #!arguments-desc=[cookie] 手动填写 Cookie，留空则用自动抓取的值 / [capture] 抓取 Cookie 开关，true 开启 / [notify] 签到通知，true 开启 / [cronExpr] 5 段 cron，默认每天 08:00
 
 [Script]

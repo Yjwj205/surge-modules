@@ -4,7 +4,7 @@
 #!homepage=https://github.com/luestr/ProxyResource/blob/main/Resource/Markdown/FollowRSS/README.md
 #!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/FollowRSS.png
 #!category=签到
-#!arguments=token:,cookie:,cron:0 1 * * *
+#!arguments=token,cookie,cron:0 1 * * *
 #!arguments-desc=[token] csrfToken / [cookie] Cookie / [cron] 定时参数
 
 [Script]
