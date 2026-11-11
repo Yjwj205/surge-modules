@@ -3,7 +3,7 @@
  "dir": "kelee",
  "total": 275,
  "converted_from": "https://github.com/Yjwj205/loon-kelee-archive",
- "generated": "2026-11-12 01:11",
+ "generated": "2026-11-12 01:13",
  "modules": [
   {
    "file": "1.1.1.1.sgmodule",
@@ -571,7 +571,7 @@
    "desc": "此插件是所有去广告插件的依赖，拦截常见的HTTPDNS服务，以确保这些请求都能够在Loon的DNS框架下工作。",
    "category": "去广告",
    "args": "",
-   "rules": 162,
+   "rules": 160,
    "scripts": 0,
    "map_local": 6,
    "url_rewrite": 0,

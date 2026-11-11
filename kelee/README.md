@@ -72,7 +72,7 @@ https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/<文�
 | [ECOVACS HOME去广告](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/EcovacsHome_remove_ads.sgmodule) | 移除横幅推广，精简底栏。 | 0 | 0 | 3 |
 | [Foodie去广告](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/Foodie_remove_ads.sgmodule) | 移除开屏广告和弹窗广告 | 3 | 0 | 0 |
 | [Google搜索重定向](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/Google.sgmodule) | 将Google搜索重定向至.com域名，如遇频繁跳转请禁用本插件。 | 0 | 0 | 2 |
-| [HTTPDNS拦截器 ⚠️MitM](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/Block_HTTPDNS.sgmodule) | 此插件是所有去广告插件的依赖，拦截常见的HTTPDNS服务，以确保这些请求都能够在Loon的… | 162 | 0 | 6 |
+| [HTTPDNS拦截器 ⚠️MitM](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/Block_HTTPDNS.sgmodule) | 此插件是所有去广告插件的依赖，拦截常见的HTTPDNS服务，以确保这些请求都能够在Loon的… | 160 | 0 | 6 |
 | [Hong Kong Toolbar去广告](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/HongKongToolbar_remove_ads.sgmodule) | 移除开屏互动广告、直播前贴片广告及视频广告 | 2 | 0 | 0 |
 | [IT之家去广告](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/IThome_remove_ads.sgmodule) | 过滤IT之家信息流广告和文末广告，自定义移除置顶和轮播图，自定义移除项需在插件配置。 | 0 | 1 | 1 |
 | [Jump去广告](https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/modules/Jump_remove_ads.sgmodule) | 移除Jump开屏广告 | 7 | 0 | 2 |
