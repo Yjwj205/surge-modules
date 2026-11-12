@@ -80,25 +80,23 @@
     if (typeof $done === "function") $done();
   }
 
-  function notify(title, subtitle, body, autoDismiss) {
+  function notify(title, subtitle, body) {
     if (typeof $notification === "undefined" || !$notification) return;
     try {
-      $notification.post(title, subtitle, body, { "auto-dismiss": !!autoDismiss });
-    } catch (e) {
-      try { $notification.post(title, subtitle, body); } catch (e2) { /* ignore */ }
-    }
+      $notification.post(title, subtitle, body);
+    } catch (e) { /* ignore */ }
   }
 
   function fail(msg) {
     log(msg);
-    if (NOTIFY) notify("Surge 准点切换失败", GROUP, msg, false);
+    if (NOTIFY) notify("Surge 准点切换失败", GROUP, msg);
     done();
   }
 
   function succeed() {
     log(GROUP + " -> " + target + " 成功");
     if (NOTIFY) {
-      notify("策略已切换", GROUP, target + " · 准点 " + new Date().toTimeString().slice(0, 5), true);
+      notify("策略已切换", GROUP, target + " · 准点 " + new Date().toTimeString().slice(0, 5));
     }
     done();
   }
