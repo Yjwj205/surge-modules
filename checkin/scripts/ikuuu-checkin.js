@@ -48,6 +48,13 @@ try {
   var manualCookie = (args.cookie === null || args.cookie === undefined)
     ? "" : String(args.cookie);
   var notifyEnabled = args.notify !== false;
+  // 通知自动消失秒数（0 = 不自动消失），需要 Surge iOS 5.11.0+ / Surge Mac 5.7.0+
+  var autoDismiss = 1200;
+  if (args.autoDismiss !== undefined && args.autoDismiss !== "") {
+    var autoSec = Number(args.autoDismiss);
+    if (!isNaN(autoSec) && autoSec >= 0) autoDismiss = autoSec;
+  }
+  var isSurge = typeof $environment !== "undefined" && $environment["surge-version"];
   var requestNode = (args.requestNode === null || args.requestNode === undefined)
     ? "" : String(args.requestNode).trim();
 
@@ -85,7 +92,11 @@ try {
   function finish(subtitle, content) {
     if (notifyEnabled) {
       try {
-        $notification.post("iKuuu 签到", subtitle, content);
+        if (isSurge && autoDismiss > 0) {
+          $notification.post("iKuuu 签到", subtitle, content, { "auto-dismiss": autoDismiss });
+        } else {
+          $notification.post("iKuuu 签到", subtitle, content);
+        }
       } catch (e) {
         console.log("[iKuuu] 通知发送失败：" + e);
       }

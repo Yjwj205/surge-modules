@@ -47,6 +47,13 @@ try {
   }
   var args = parseArgs(typeof $argument !== "undefined" ? $argument : "");
   var notifyEnabled = String(args.notify).toLowerCase() !== "false";
+  // 通知自动消失秒数（0 = 不自动消失），需要 Surge iOS 5.11.0+ / Surge Mac 5.7.0+
+  var autoDismiss = 1200;
+  if (args.autoDismiss !== undefined && args.autoDismiss !== "") {
+    var autoSec = Number(args.autoDismiss);
+    if (!isNaN(autoSec) && autoSec >= 0) autoDismiss = autoSec;
+  }
+  var isSurge = typeof $environment !== "undefined" && $environment["surge-version"];
   // Surge 没有 enable= 开关，用参数在脚本里自行短路
   if (String(args.capture).toLowerCase() === "false") {
     console.log("[iKuuu] 抓取开关已关闭，跳过");
@@ -56,7 +63,11 @@ try {
   function notify(subtitle, content) {
     if (!notifyEnabled) return;
     try {
-      $notification.post("iKuuu Cookie 抓取", subtitle, content);
+      if (isSurge && autoDismiss > 0) {
+        $notification.post("iKuuu Cookie 抓取", subtitle, content, { "auto-dismiss": autoDismiss });
+      } else {
+        $notification.post("iKuuu Cookie 抓取", subtitle, content);
+      }
     } catch (e) {
       console.log("[iKuuu] 通知发送失败：" + e);
     }

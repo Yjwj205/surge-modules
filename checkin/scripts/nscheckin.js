@@ -11,6 +11,8 @@ let tgUserId = "";
 let notifyOnlyFail = false;
 let enableCapture = true; // 默认开启抓取
 let useRandomReward = false; // 默认关闭随机鸡腿
+// 通知自动消失秒数（0 = 不自动消失），需要 Surge iOS 5.11.0+ / Surge Mac 5.7.0+
+let autoDismiss = 1200;
 const COOKIE_CACHE_KEY = "NS_LOON_COOKIE";
 const COOKIE_EXPIRY_KEY = "NS_LOON_COOKIE_EXPIRY";
 
@@ -49,10 +51,29 @@ if (typeof $argument !== "undefined" && $argument) {
         if (randomVal !== undefined) {
             useRandomReward = (randomVal === true || String(randomVal).toLowerCase() === "true");
         }
+
+        const dismissVal = arg.autoDismiss;
+        if (dismissVal !== undefined && dismissVal !== "") {
+            const sec = Number(dismissVal);
+            if (!isNaN(sec) && sec >= 0) autoDismiss = sec;
+        }
     } catch (e) {
     }
 }
 // ===============================================
+
+// 通知统一入口：Surge 下附带 auto-dismiss，到点自动从通知中心消失
+function postNotify(title, subtitle, body) {
+    try {
+        if (typeof $environment !== "undefined" && $environment["surge-version"] && autoDismiss > 0) {
+            $notification.post(title, subtitle, body, { "auto-dismiss": autoDismiss });
+        } else {
+            $notification.post(title, subtitle, body);
+        }
+    } catch (e) {
+        console.log("[NS签到] 通知发送失败：" + e);
+    }
+}
 
 const isGetHeader = typeof $request !== "undefined";
 
@@ -88,7 +109,7 @@ function handleCaptureCookie() {
 
     if (!cookie) {
         console.log("[NS签到] ⚠️ 提取 Cookie 为空，原始全量Header为: " + JSON.stringify(allHeaders));
-        $notification.post("NS Cookie 获取失败", "", "未能从请求中找到 Cookie，请检查抓包逻辑重新访问个人页面尝试。");
+        postNotify("NS Cookie 获取失败", "", "未能从请求中找到 Cookie，请检查抓包逻辑重新访问个人页面尝试。");
     } else {
         // 利用 Loon 的 persistentStore 持久化保存
         const success = $persistentStore.write(cookie, COOKIE_CACHE_KEY);
@@ -112,10 +133,10 @@ function handleCaptureCookie() {
 
         if (success) {
             console.log("[NS签到] ✨ 成功保存 Cookie: " + cookie.substring(0, 30) + "...");
-            $notification.post("NS Cookie 获取成功", "", `Cookie 已保存。\nSession 预计过期时间：${expiryDateStr}\n请前往插件关闭【抓取开关】。`);
+            postNotify("NS Cookie 获取成功", "", `Cookie 已保存。\nSession 预计过期时间：${expiryDateStr}\n请前往插件关闭【抓取开关】。`);
         } else {
             console.log("[NS签到] ❌ 保存 Cookie 失败");
-            $notification.post("NS Cookie 保存失败", "", "写入存储失败，请检查 Loon 的存储权限。");
+            postNotify("NS Cookie 保存失败", "", "写入存储失败，请检查 Loon 的存储权限。");
         }
     }
 }
@@ -136,7 +157,7 @@ async function handleCheckin() {
     if (!finalCookie) {
         const msg = "📉 未检测到脚本的 Cookie 参数 或 持久化Cookie，请打开 Cookie 抓去开关前往 NodeSeek 登录一次。";
         console.log("[NS签到] " + msg);
-        $notification.post("NS签到结果", "❌ 无法签到", msg);
+        postNotify("NS签到结果", "❌ 无法签到", msg);
         await sendTgNotify("<b>❌ NodeSeek 签到失败</b>\n\n原因: <code>未检测到参数中传入的 NodeSeek Cookie，请检查配置！</code>");
         return;
     }
@@ -167,7 +188,7 @@ async function handleCheckin() {
     } catch (error) {
         const errStr = error?.error || error?.message || String(error);
         console.log(`[NS签到] 网络请求出现异常: ${errStr}`);
-        $notification.post("NS签到结果", "⚠️ 网络请求异常", errStr);
+        postNotify("NS签到结果", "⚠️ 网络请求异常", errStr);
         await sendTgNotify(`<b>⚠️ NodeSeek 签到系统/网络异常</b>\n\n详细信息: \n<code>${escapeHtml(errStr)}</code>`);
     }
 }
@@ -195,7 +216,7 @@ async function processResponse(resp) {
     // NodeSeek 对重复签到返回 500 + 「今天已完成签到，请勿重复操作」，按成功处理
     if (/已完成签到|已经签到|已签到|重复操作|请勿重复/.test(content)) {
         console.log(`[NS签到] ✅ 今日已签到: ${content}`);
-        $notification.post("NS活动签到", "✅ 今日已签到", content);
+        postNotify("NS活动签到", "✅ 今日已签到", content);
         if (!notifyOnlyFail) {
             await sendTgNotify(`<b>✅ NodeSeek 今日已签到</b>\n\n返回信息：\n<code>${escapeHtml(content)}</code>`);
         }
@@ -205,7 +226,7 @@ async function processResponse(resp) {
     if (status >= 200 && status < 300) {
         const notifyStr = msg || "您已签到成功或已经签过到了";
         console.log(`[NS签到] ✅ 签到响应成功: ${notifyStr}`);
-        $notification.post("NS活动签到", "✅ 签到成功", notifyStr);
+        postNotify("NS活动签到", "✅ 签到成功", notifyStr);
 
         if (!notifyOnlyFail) {
             await sendTgNotify(`<b>🎉 NodeSeek 自动签到成功</b>\n\n状态码: ${status}\n返回信息：\n<code>${escapeHtml(notifyStr)}</code>`);
@@ -213,19 +234,19 @@ async function processResponse(resp) {
     } else if (status === 403) {
         const notifyStr = `遭受 Cloudflare 或 系统风控，请稍后重试\n拦截详情：${content}`;
         console.log(`[NS签到] ⚠️ 403风控拦截: ${notifyStr}`);
-        $notification.post("NS活动签到", "⚠️ 403 风控拦截", notifyStr);
+        postNotify("NS活动签到", "⚠️ 403 风控拦截", notifyStr);
         await sendTgNotify(`<b>⚠️ NodeSeek 签到被风控拦截(403)</b>\n\n拦截信息详情：\n<code>${escapeHtml(content)}</code>`);
 
     } else if (status === 500) {
         const notifyStr = `服务器发生内部报错(500)\n内容：${content}`;
         console.log(`[NS签到] ❌ 500错误: ${notifyStr}`);
-        $notification.post("NS活动签到", "❌ 服务器内部错误", notifyStr);
+        postNotify("NS活动签到", "❌ 服务器内部错误", notifyStr);
         await sendTgNotify(`<b>❌ NodeSeek 签到服务器错误(500)</b>\n\n错误信息详情：\n<code>${escapeHtml(content)}</code>`);
 
     } else {
         const notifyStr = `请求返回了异常状态码: ${status}\n内容：${content}`;
         console.log(`[NS签到] ❓ 未知异常: ${notifyStr}`);
-        $notification.post("NS活动签到", `❓ 未知请求异常 (${status})`, notifyStr);
+        postNotify("NS活动签到", `❓ 未知请求异常 (${status})`, notifyStr);
         await sendTgNotify(`<b>❓ NodeSeek 签到未知异常状态 (${status})</b>\n\n异常信息详情：\n<code>${escapeHtml(content)}</code>`);
     }
 }
@@ -311,13 +332,13 @@ async function checkCookieExpiry() {
     if (remainMs <= 0) {
         const warnMsg = `Session Cookie 已于 ${expiryDateStr} 过期，签到可能失败！请重新登录 NodeSeek 并抓取 Cookie。`;
         console.log(`[NS签到] 🔴 ${warnMsg}`);
-        $notification.post("NS签到警告", "🔴 Cookie 已过期", warnMsg);
+        postNotify("NS签到警告", "🔴 Cookie 已过期", warnMsg);
         await sendTgNotify(`<b>🔴 NodeSeek Cookie 已过期</b>\n\n过期时间: <code>${expiryDateStr}</code>\n请立即重新登录 NodeSeek 并重新抓取 Cookie。`);
     } else if (remainHours < 48) {
         const hours = Math.floor(remainHours);
         const warnMsg = `Session Cookie 将在约 ${hours} 小时后过期（${expiryDateStr}），请尽快重新登录 NodeSeek 刷新 Cookie！`;
         console.log(`[NS签到] 🟡 ${warnMsg}`);
-        $notification.post("NS签到警告", "🟡 Cookie 即将过期", warnMsg);
+        postNotify("NS签到警告", "🟡 Cookie 即将过期", warnMsg);
         await sendTgNotify(`<b>🟡 NodeSeek Cookie 即将过期</b>\n\n剩余时间: <code>约 ${hours} 小时</code>\n过期时间: <code>${expiryDateStr}</code>\n建议重新登录 NodeSeek 并重新抓取 Cookie。`);
     } else {
         const days = Math.floor(remainHours / 24);

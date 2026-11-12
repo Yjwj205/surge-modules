@@ -20,7 +20,10 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 | `cookie` | 空 | 手动粘贴完整 Cookie，留空则用自动抓取保存的值 |
 | `capture` | `true` | Cookie 抓取开关，抓完可改 `false` |
 | `notify` | `true` | 签到结果通知 |
+| `autoDismiss` | `1200` | 通知多少秒后自动从通知中心消失，默认 1200 = 20 分钟，`0` 为不自动消失（需 Surge iOS 5.11.0+ / Mac 5.7.0+） |
 | `cronExpr` | `0 8 * * *` | 5 段 cron，默认每天 08:00 |
+
+> 通知会自动消失（默认 20 分钟）。这由 Surge 在通知层实现，脚本发完通知就结束，不会常驻计时，基本不影响耗电。
 
 **首次使用**（二选一）：
 1. 保持 `capture=true` → Safari 打开 `https://ikuuu.org` 登录一次 → 抓取成功后可在模块参数里把 `capture` 改成 `false`；
@@ -45,6 +48,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 | `TG_USER_ID` | 空 | 选填，接收消息的 User ID |
 | `TG_NOTIFY_ONLY_FAIL` | `false` | 仅失败时推送 TG |
 | `RANDOM_REWARD` | `false` | 随机奖励模式 |
+| `autoDismiss` | `1200` | 通知多少秒后自动从通知中心消失，默认 1200 = 20 分钟，`0` 为不自动消失（需 Surge iOS 5.11.0+ / Mac 5.7.0+） |
 
 **首次使用**：保持 `ENABLE_CAPTURE=true` → Safari 打开 `https://www.nodeseek.com` 并登录，触发一次 `getInfo` 请求即可自动保存 Cookie，之后可关闭抓取。
 
