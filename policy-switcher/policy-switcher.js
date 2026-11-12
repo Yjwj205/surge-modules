@@ -93,10 +93,10 @@
     done();
   }
 
-  function succeed() {
+  function succeed(from) {
     log(GROUP + " -> " + target + " 成功");
     if (NOTIFY) {
-      notify("策略已切换", GROUP, target + " · 准点 " + new Date().toTimeString().slice(0, 5));
+      notify("策略已切换", GROUP, (from || "?") + "→" + target);
     }
     done();
   }
@@ -120,14 +120,14 @@
   }
 
   /** 回读一次，确认切换真的生效 */
-  function verify(claimed, hint) {
+  function verify(claimed, hint, from) {
     var state = stateSync();
     if (!state) {
       // 没有读状态的 API：只能相信切换调用的返回值
       if (claimed === false) return fail(hint || "切换失败");
-      return succeed();
+      return succeed(from);
     }
-    if (state.current === target) return succeed();
+    if (state.current === target) return succeed(from);
 
     var msg = hint ? hint + "；" : "";
     msg += "当前=" + (state.current || "?") + "，目标=" + target + "（核对策略组/子策略名称）";
@@ -138,9 +138,11 @@
   }
 
   function apply(before) {
-    if (before && before.current === target) {
+    var from = (before && before.current) ? String(before.current) : "";
+
+    if (from && from === target) {
       log(GROUP + " 已是 " + target + "，无需切换");
-      if (NOTIFY) notify("已在目标策略", GROUP, "");
+      if (NOTIFY) notify("已在目标策略", "", GROUP + "←=→" + target);
       return done();
     }
 
@@ -151,7 +153,7 @@
       } catch (e) {
         return fail("setSelectGroupPolicy 异常: " + e);
       }
-      return verify(ok, ok ? "" : "setSelectGroupPolicy 返回 false");
+      return verify(ok, ok ? "" : "setSelectGroupPolicy 返回 false", from);
     }
 
     if (HTTP) {
@@ -159,7 +161,7 @@
         { group_name: GROUP, policy: target },
         function (result) {
           if (result && result.error) return fail("HTTP API 返回错误: " + result.error);
-          verify(true, "");
+          verify(true, "", from);
         });
     }
 
