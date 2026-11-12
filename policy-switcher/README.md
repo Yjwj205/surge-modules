@@ -32,6 +32,18 @@ Surge → 首页 → 模块 → 安装新模块 → 粘贴上面的地址 → �
 - **幂等**：切换前用 `$surge.selectGroupDetails()` 读当前选中项，已经是目标就直接跳过，**不切换也不发通知**；面板里手动刷新也不会误切换。
 - **错误处理**：目标不在该策略组的子策略里 / 策略组不存在（不是 select 组）/ 没有可用 API，都会发一条常驻通知说明原因，并把可选的子策略列出来。
 
+## 与 Loon 版的区别
+
+| | Loon 版 | Surge 版 |
+|---|---|---|
+| 切换 API | `$config.setSelectPolicy()` | `$surge.setSelectGroupPolicy()`（老版本回退 HTTP API） |
+| 触发 | cron 每 5 分钟轮询，按 `schedule` 字符串判断 | 两个精确 cron（09:00 / 19:00）+ 启动补切 + 面板 |
+| 配置 | `group` + `schedule=09:00=A;19:00=B` | `group` + `amCron/amTarget` + `pmCron/pmTarget` |
+| 状态查看 | 无 | Surge「策略」页信息面板（当前节点 / 下次切换 / 上次切换） |
+
+Surge 的 cron 是精确到分的，不需要轮询；`wake-system=1` 会预约静默本地通知把 Surge 叫醒。
+因此 Surge 版没有沿用「轮询 + schedule 字符串」，省电，而且不会像轮询那样把手动选择的节点改回去。
+
 ## 参数
 
 | 参数 | 默认值 | 说明 |
@@ -65,6 +77,7 @@ Surge → 首页 → 模块 → 安装新模块 → 粘贴上面的地址 → �
 
 - **Surge 没运行就切不了**。iOS 上 `wake-system=1` 会预约一条静默本地通知把 Surge 叫醒，但系统省电策略、勿扰/通知权限仍可能让它错过；错过时靠 `engine-started` 补切（打开 Surge 那一刻按当前时间对齐）。
 - 只支持 **select** 类型的策略组；url-test / fallback / load-balance 这类自动组没有「选中项」，切换会失败并通知。
+- 老版本 Surge 没有 `$surge` 模块时会回退 `$httpAPI` → `POST /v1/policy_groups/select`；如果连这一步也失败，通知里会写明原因（个别版本需要 profile 的 `[General]` 里有 `http-api` 才会放行）。
 - 策略组名、子策略名必须和 Surge 里**完全一致**（含 emoji、空格）。
 - 到点后如果你手动切到别的节点，不会在下次定时前被改回去（比 Loon 版的高频轮询更「尊重手动选择」）。
 - 在 Surge Mac 上 `wake-system` 无意义，其余功能相同。
