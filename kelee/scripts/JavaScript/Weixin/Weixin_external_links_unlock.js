@@ -5,10 +5,21 @@ let persisVal = read("UnblockURLinWeChat");
 let useCache = persisVal.useCache === "true"; //是否在微信中用快照显示被封禁的链接
 let forceRedirect = persisVal.forceRedirect === "true"; //是否在微信中进行强制重定向，允许的情况下可能出现循环重定向
 let wechatExportKey = persisVal.wechatExportKey || ""; //微信的一个 key，暂未研究如何生成，测试中仅 macOS 微信打开链接跳转浏览器时会缺失，导致无法解析原始链接
-if (typeof $argument != "undefined") {
-    let arg = Object.fromEntries($argument.split("&").map((item) => item.split("=")));
-    useCache = arg.useCache === "true";
-    forceRedirect = arg.forceRedirect === "ture";
+let autoDismiss = 5; //通知发出后自动消失的秒数（0 = 不自动消失），需要 Surge iOS 5.11.0+ / Surge Mac 5.7.0+
+if (typeof $argument != "undefined" && $argument) {
+    let arg = Object.fromEntries(
+        $argument.split("&").map((item) => {
+            let i = item.indexOf("=");
+            return i < 0 ? [item, ""] : [item.slice(0, i), item.slice(i + 1)];
+        })
+    );
+    //仅在参数真正提供时才覆盖，避免只传 autoDismiss 时把 BoxJs 里的开关冲掉
+    if (arg.useCache !== undefined) useCache = arg.useCache === "true";
+    if (arg.forceRedirect !== undefined) forceRedirect = arg.forceRedirect === "true" || arg.forceRedirect === "ture";
+    if (arg.autoDismiss !== undefined && arg.autoDismiss !== "") {
+        let sec = Number(arg.autoDismiss);
+        if (!isNaN(sec) && sec >= 0) autoDismiss = sec;
+    }
 }
 const respBody = $response.body;
 //const cacheURL = "https://webcache.googleusercontent.com/search?q=cache:";
@@ -16,10 +27,9 @@ const cacheURL = "https://web.archive.org/web/20991231999999/";
 const alipayScheme = "alipays://platformapi/startapp?appId=20000067&url=";
 
 const isQuanX = typeof $notify != "undefined";
-const isSurgeiOS =
-    "undefined" !== typeof $environment &&
-    $environment["surge-version"] &&
-    $environment.system == "iOS";
+const isSurge =
+    "undefined" !== typeof $environment && $environment["surge-version"];
+const isSurgeiOS = isSurge && $environment.system == "iOS";
 const isLooniOS = typeof $loon != "undefined" && /iPhone/.test($loon);
 const isStashiOS =
     "undefined" !== typeof $environment &&
@@ -121,6 +131,7 @@ function notify(title = "", subtitle = "", content = "", open_url) {
     } else if (isSurgeiOS || isStashiOS || isLanceX) {
         let opts = {};
         if (open_url) opts["url"] = open_url;
+        if (isSurge && autoDismiss > 0) opts["auto-dismiss"] = autoDismiss;
         if (JSON.stringify(opts) == "{}") {
             $notification.post(title, subtitle, content);
         } else {
