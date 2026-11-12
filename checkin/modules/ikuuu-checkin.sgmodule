@@ -3,8 +3,8 @@
 #!author=Yjwj205 / Minis
 #!homepage=https://github.com/Yjwj205/loon-modules
 #!category=签到
-#!arguments=cookie:none,capture:true,notify:true,autoDismiss:1200,cronExpr:0 8 * * *
-#!arguments-desc=[cookie] 手动填写 Cookie，留空则用自动抓取的值 / [capture] 抓取 Cookie 开关，true 开启 / [notify] 签到通知，true 开启 / [autoDismiss] 通知多少秒后自动消失，默认 1200（20 分钟），填 0 为不自动消失 / [cronExpr] 5 段 cron，默认每天 08:00
+#!arguments=cookie:none,capture:true,notify:true,autoDismiss:false,cronExpr:0 8 * * *
+#!arguments-desc=[cookie] 手动填写 Cookie，留空则用自动抓取的值 / [capture] 抓取 Cookie 开关，true 开启 / [notify] 签到通知，true 开启 / [autoDismiss] 通知自动消失（Surge 内置约 10 秒，时长不可调）；false 为常驻通知中心 / [cronExpr] 5 段 cron，默认每天 08:00
 
 [Script]
 iKuuu-CookieCapture = type=http-request, pattern=^https?:\/\/(?:www\.)?ikuuu\.org(?:[\/?]|$), script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-cookie.js, argument="notify={{{notify}}}&capture={{{capture}}}&autoDismiss={{{autoDismiss}}}", max-size=-1

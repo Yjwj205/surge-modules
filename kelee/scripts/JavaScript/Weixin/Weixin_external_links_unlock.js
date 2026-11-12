@@ -5,7 +5,9 @@ let persisVal = read("UnblockURLinWeChat");
 let useCache = persisVal.useCache === "true"; //是否在微信中用快照显示被封禁的链接
 let forceRedirect = persisVal.forceRedirect === "true"; //是否在微信中进行强制重定向，允许的情况下可能出现循环重定向
 let wechatExportKey = persisVal.wechatExportKey || ""; //微信的一个 key，暂未研究如何生成，测试中仅 macOS 微信打开链接跳转浏览器时会缺失，导致无法解析原始链接
-let autoDismiss = 5; //通知发出后自动消失的秒数（0 = 不自动消失），需要 Surge iOS 5.11.0+ / Surge Mac 5.7.0+
+// Surge 的 auto-dismiss 是布尔开关，官方固定约 10 秒后消失，不支持自定义秒数
+// （Surge iOS 5.11.0+ / Mac 5.7.0+；false = 通知常驻通知中心）
+let autoDismiss = true;
 if (typeof $argument != "undefined" && $argument) {
     let arg = Object.fromEntries(
         $argument.split("&").map((item) => {
@@ -17,8 +19,8 @@ if (typeof $argument != "undefined" && $argument) {
     if (arg.useCache !== undefined) useCache = arg.useCache === "true";
     if (arg.forceRedirect !== undefined) forceRedirect = arg.forceRedirect === "true" || arg.forceRedirect === "ture";
     if (arg.autoDismiss !== undefined && arg.autoDismiss !== "") {
-        let sec = Number(arg.autoDismiss);
-        if (!isNaN(sec) && sec >= 0) autoDismiss = sec;
+        let v = String(arg.autoDismiss).trim().toLowerCase();
+        autoDismiss = !(v === "false" || v === "0" || v === "off");
     }
 }
 const respBody = $response.body;
@@ -131,7 +133,7 @@ function notify(title = "", subtitle = "", content = "", open_url) {
     } else if (isSurgeiOS || isStashiOS || isLanceX) {
         let opts = {};
         if (open_url) opts["url"] = open_url;
-        if (isSurge && autoDismiss > 0) opts["auto-dismiss"] = autoDismiss;
+        if (isSurge && autoDismiss) opts["auto-dismiss"] = true;
         if (JSON.stringify(opts) == "{}") {
             $notification.post(title, subtitle, content);
         } else {

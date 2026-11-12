@@ -11,8 +11,9 @@ let tgUserId = "";
 let notifyOnlyFail = false;
 let enableCapture = true; // 默认开启抓取
 let useRandomReward = false; // 默认关闭随机鸡腿
-// 通知自动消失秒数（0 = 不自动消失），需要 Surge iOS 5.11.0+ / Surge Mac 5.7.0+
-let autoDismiss = 1200;
+// Surge 的 auto-dismiss 是布尔开关（官方固定约 10 秒后消失，不支持自定义秒数）
+// true = 通知自动消失；false = 常驻通知中心。需要 Surge iOS 5.11.0+ / Mac 5.7.0+
+let autoDismiss = false;
 const COOKIE_CACHE_KEY = "NS_LOON_COOKIE";
 const COOKIE_EXPIRY_KEY = "NS_LOON_COOKIE_EXPIRY";
 
@@ -54,8 +55,8 @@ if (typeof $argument !== "undefined" && $argument) {
 
         const dismissVal = arg.autoDismiss;
         if (dismissVal !== undefined && dismissVal !== "") {
-            const sec = Number(dismissVal);
-            if (!isNaN(sec) && sec >= 0) autoDismiss = sec;
+            const v = String(dismissVal).trim().toLowerCase();
+            autoDismiss = !(v === "false" || v === "0" || v === "off");
         }
     } catch (e) {
     }
@@ -65,8 +66,8 @@ if (typeof $argument !== "undefined" && $argument) {
 // 通知统一入口：Surge 下附带 auto-dismiss，到点自动从通知中心消失
 function postNotify(title, subtitle, body) {
     try {
-        if (typeof $environment !== "undefined" && $environment["surge-version"] && autoDismiss > 0) {
-            $notification.post(title, subtitle, body, { "auto-dismiss": autoDismiss });
+        if (typeof $environment !== "undefined" && $environment["surge-version"] && autoDismiss) {
+            $notification.post(title, subtitle, body, { "auto-dismiss": true });
         } else {
             $notification.post(title, subtitle, body);
         }

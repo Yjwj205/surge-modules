@@ -1,11 +1,11 @@
 #!name=微信外部链接解锁
-#!desc=解锁微信外部链接访问限制，跳过中间界面。支付宝链接、被封禁链接进行通知弹窗跳转，在微信中用快照显示被封禁的链接（可选），在微信中进行强制重定向（可选），群聊及扫码均可使用，可选项可在脚本的2~3行更改，也可在BoxJs中更改。通知默认 5 秒后自动消失，可通过模块参数 [autoDismiss] 调整（0 为不自动消失）。
+#!desc=解锁微信外部链接访问限制，跳过中间界面。支付宝链接、被封禁链接进行通知弹窗跳转，在微信中用快照显示被封禁的链接（可选），在微信中进行强制重定向（可选），群聊及扫码均可使用，可选项可在脚本的2~3行更改，也可在BoxJs中更改。通知可通过模块参数 [autoDismiss] 设为自动消失（Surge 内置时长约 10 秒）。
 #!author=zZPiglet[https://github.com/zZPiglet]
 #!homepage=https://hub.kelee.one
 #!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Weixin.png
 #!category=功能增强
-#!arguments=autoDismiss:5
-#!arguments-desc=[autoDismiss] 通知自动消失秒数（默认 5，填 0 为不自动消失）
+#!arguments=autoDismiss:true
+#!arguments-desc=[autoDismiss] 通知自动消失（Surge 内置约 10 秒，时长不可调）；false 为常驻通知中心
 
 [Script]
 Weixin_external_links_unlock · 微信外部链接解锁 = type=http-response, pattern=(?i)^https\:\/\/(weixin110\.qq|security.wechat)\.com\/cgi-bin\/mmspamsupport-bin\/newredirectconfirmcgi\?, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/kelee/scripts/JavaScript/Weixin/Weixin_external_links_unlock.js, argument="autoDismiss={{{autoDismiss}}}", requires-body=1, max-size=-1

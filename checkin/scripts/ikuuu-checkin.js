@@ -48,11 +48,12 @@ try {
   var manualCookie = (args.cookie === null || args.cookie === undefined)
     ? "" : String(args.cookie);
   var notifyEnabled = args.notify !== false;
-  // 通知自动消失秒数（0 = 不自动消失），需要 Surge iOS 5.11.0+ / Surge Mac 5.7.0+
-  var autoDismiss = 1200;
+  // Surge 的 auto-dismiss 是布尔开关（官方固定约 10 秒后消失，不支持自定义秒数）
+  // true = 通知自动消失；false = 常驻通知中心。需要 Surge iOS 5.11.0+ / Mac 5.7.0+
+  var autoDismiss = false;
   if (args.autoDismiss !== undefined && args.autoDismiss !== "") {
-    var autoSec = Number(args.autoDismiss);
-    if (!isNaN(autoSec) && autoSec >= 0) autoDismiss = autoSec;
+    var dismissVal = String(args.autoDismiss).trim().toLowerCase();
+    autoDismiss = !(dismissVal === "false" || dismissVal === "0" || dismissVal === "off");
   }
   var isSurge = typeof $environment !== "undefined" && $environment["surge-version"];
   var requestNode = (args.requestNode === null || args.requestNode === undefined)
@@ -92,8 +93,8 @@ try {
   function finish(subtitle, content) {
     if (notifyEnabled) {
       try {
-        if (isSurge && autoDismiss > 0) {
-          $notification.post("iKuuu 签到", subtitle, content, { "auto-dismiss": autoDismiss });
+        if (isSurge && autoDismiss) {
+          $notification.post("iKuuu 签到", subtitle, content, { "auto-dismiss": true });
         } else {
           $notification.post("iKuuu 签到", subtitle, content);
         }
