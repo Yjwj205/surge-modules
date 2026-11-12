@@ -46,9 +46,9 @@ Loon 的旧版（`policy-switcher.plugin`）是每 5 分钟轮询一次；**准�
 
 - 两条 cron 各自以 `argument="group=…&target=…&notify=…"` 触发，目标直接来自参数；
 - 没显式传 `target` 时按当前小时兜底：**12 点前用 `amTarget`，之后用 `pmTarget`**（和 `switch-exact.js` 一致，用于手动跑脚本）；
-- **幂等**：先读 `$surge.selectGroupDetails()` 的当前选中项，已经是目标就直接退出，不切换、不通知；
+- **已在目标上**：先读 `$surge.selectGroupDetails()` 的当前选中项，已经是目标就不切换，但仍然发一条「已在目标策略」通知（`notify=false` 时静默）；
 - **切换后复核**：再读一次选中项，只有确认等于目标才发「策略已切换」，否则发失败通知（含当前值、目标值、可选的子策略列表）；
-- 成功通知：标题 `策略已切换`，正文 `目标 · 准点 09:00`；不设 `auto-dismiss`，通知留在通知中心不自动清除。
+- 成功通知：标题 `策略已切换`，正文 `目标 · 准点 09:00`；已在目标时标题为 `已在目标策略`，正文带「（未切换）」。不设 `auto-dismiss`，通知留在通知中心不自动清除。
 
 ## 与 Loon 版的 API 映射
 
@@ -76,4 +76,4 @@ Loon 的旧版（`policy-switcher.plugin`）是每 5 分钟轮询一次；**准�
 node test.js
 ```
 
-覆盖：早晚显式 target、幂等跳过、无 target 时按小时兜底（11:59 / 12:00 边界）、目标不存在、setter 假成功后的复核、老版本 HTTP API 回退、无 API 环境、参数四种写法（query / JSON / 对象 / 缺省）、带空格中文名、notify=false 静默。
+覆盖：早晚显式 target、已在目标仍通知、无 target 时按小时兜底（11:59 / 12:00 边界）、目标不存在、setter 假成功后的复核、老版本 HTTP API 回退、无 API 环境、参数四种写法（query / JSON / 对象 / 缺省）、带空格中文名、notify=false 静默。
