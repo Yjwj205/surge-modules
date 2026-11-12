@@ -4,7 +4,7 @@
 #!homepage=https://github.com/Yjwj205/loon-modules
 #!category=签到
 #!arguments=cookie:none,capture:true,notify:true,autoDismiss:false,cronExpr:0 8 * * *
-#!arguments-desc=[cookie] 手动填写 Cookie，留空则用自动抓取的值 / [capture] 抓取 Cookie 开关，true 开启 / [notify] 签到通知，true 开启 / [autoDismiss] 通知自动消失（Surge 内置约 10 秒，时长不可调）；false 为常驻通知中心 / [cronExpr] 5 段 cron，默认每天 08:00
+#!arguments-desc=参数说明（按参数顺序）\n\n① [cookie] 手动填写 Cookie；填 none 则使用自动抓取的值\n② [capture] 抓取开关：true 开启 / false 关闭；开启后打开 ikuuu.org 登录一次即自动抓取\n③ [notify] 通知开关：true 显示签到与抓取通知 / false 静默\n④ [autoDismiss] 通知自动消失：true 约 10 秒后消失 / false 常驻通知中心（Surge 内置时长，不可调）\n⑤ [cronExpr] 5 段 cron（分 时 日 月 周）；默认 0 8 * * *，即每天 08:00
 
 [Script]
 iKuuu-CookieCapture = type=http-request, pattern=^https?:\/\/(?:www\.)?ikuuu\.org(?:[\/?]|$), script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-cookie.js, argument="notify={{{notify}}}&capture={{{capture}}}&autoDismiss={{{autoDismiss}}}", max-size=-1

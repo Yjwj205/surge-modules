@@ -5,7 +5,7 @@
 #!icon=https://raw.githubusercontent.com/Roddy-D/Loon_plugins/refs/heads/main/icon/nscheckin.png
 #!category=签到
 #!arguments=CRON_TIME:1 0 * * *,ENABLE_CAPTURE:true,NS_COOKIE:none,TG_BOT_TOKEN:none,TG_USER_ID:none,TG_NOTIFY_ONLY_FAIL:false,RANDOM_REWARD:false,autoDismiss:false
-#!arguments-desc=[CRON_TIME] 签到执行时间（5 段 cron） / [ENABLE_CAPTURE] 打开后在 NodeSeek 页面可自动抓取 Cookie / [NS_COOKIE] Cookie，抓取后自动保存在本地，也可手动粘贴 / [TG_BOT_TOKEN] 选填，Telegram Bot Token / [TG_USER_ID] 选填，接收消息的 User ID / [TG_NOTIFY_ONLY_FAIL] 仅失败时推送 TG / [RANDOM_REWARD] 随机奖励模式 / [autoDismiss] 通知自动消失（Surge 内置约 10 秒，时长不可调）；false 为常驻通知中心
+#!arguments-desc=参数说明（按参数顺序）\n\n① [CRON_TIME] 5 段 cron（分 时 日 月 周）；默认 1 0 * * *，即每天 00:01\n② [ENABLE_CAPTURE] 抓取开关：true 开启 / false 关闭；开启后打开 NodeSeek 并登录，触发一次个人主页即自动抓取\n③ [NS_COOKIE] 手动粘贴 Cookie；填 none 则使用自动抓取并保存在本地的那份\n④ [TG_BOT_TOKEN] 选填，Telegram Bot 的 Token；留空则不推送\n⑤ [TG_USER_ID] 选填，接收消息的 User ID；与 Token 同时填写才推送\n⑥ [TG_NOTIFY_ONLY_FAIL] 仅失败时推送 TG：true 开启 / false 关闭\n⑦ [RANDOM_REWARD] 随机奖励模式：true 开启 / false 普通签到\n⑧ [autoDismiss] 通知自动消失：true 约 10 秒后消失 / false 常驻通知中心（Surge 内置时长，不可调）
 
 [Script]
 NodeSeek-CookieCapture = type=http-request, pattern=^https:\/\/www\.nodeseek\.com\/api\/account\/getInfo\/, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, argument="ENABLE_CAPTURE={{{ENABLE_CAPTURE}}}&autoDismiss={{{autoDismiss}}}", requires-body=0, max-size=0

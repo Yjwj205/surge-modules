@@ -4,7 +4,7 @@
 #!homepage=https://github.com/Yjwj205/surge-modules
 #!category=策略
 #!arguments=group:A,amTime:0 0 9 * * *,amTarget:B,pmTime:0 0 19 * * *,pmTarget:C,notify:true
-#!arguments-desc=[group] 策略组名称，必须与 Surge 中的策略组名完全一致 / [amTime] 早上触发时间，6 段 cron：秒 分 时 日 月 周，0 0 9 * * * = 每天 09:00:00 / [amTarget] 早上切换为，填子策略名称 / [pmTime] 晚上触发时间，0 0 19 * * * = 每天 19:00:00 / [pmTarget] 晚上切换为 / [notify] 切换时通知
+#!arguments-desc=参数说明（按参数顺序）\n\n① [group] 策略组名称，必须与 Surge 中的策略组名完全一致（select 类型）\n② [amTime] 早上触发时间，6 段 cron（秒 分 时 日 月 周）；默认 0 0 9 * * * = 每天 09:00:00\n③ [amTarget] 早上切换到的子策略名称\n④ [pmTime] 晚上触发时间，6 段 cron；默认 0 0 19 * * * = 每天 19:00:00\n⑤ [pmTarget] 晚上切换到的子策略名称\n⑥ [notify] 切换时通知（含失败通知）：true 开启 / false 静默
 
 [Script]
 PolicySwitch-AM = type=cron, cronexp="{{{amTime}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/policy-switcher/policy-switcher.js?v=5, script-update-interval=3600, argument="group={{{group}}}&target={{{amTarget}}}&notify={{{notify}}}", timeout=20, wake-system=1

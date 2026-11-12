@@ -3,7 +3,7 @@
 #!category=network
 #!author=@Minis
 #!arguments=ICON:antenna.radiowaves.left.and.right,ICON-COLOR:#34C759,TIMEOUT:5,EVENT_SCRIPT_NAME:网络状态通知,EVENT_DELAY:1,PANEL_NAME:网络状态面板,UPDATE-INTERVAL:-1
-#!arguments-desc=网络状态 𝕏 参数说明\n\n1 为开启, 0 为关闭 (本模块暂无开关项)\n\n · [ICON]: 面板图标, 填写 SF Symbol 名称, 如 wifi, network, antenna.radiowaves.left.and.right\n\n · [ICON-COLOR]: 面板图标颜色, 十六进制色值, 如 #34C759\n\n · [TIMEOUT]: 运营商查询请求超时时间 (单位: 秒)\n\n · [EVENT_SCRIPT_NAME]: 网络变化通知的脚本名称\n若要禁用网络变化通知, 请输入 #\n\n · [EVENT_DELAY]: 网络变化后, 延迟查询运营商信息的时间 (单位: 秒, 建议 1-3, 过短可能导致网络尚未就绪)\n\n · [PANEL_NAME]: 网络状态面板名称\n若要禁用面板, 请输入 #\n\n · [UPDATE-INTERVAL]: 面板自动刷新间隔 (单位: 秒, -1 为仅手动刷新)
+#!arguments-desc=参数说明（按参数顺序）\n\n① [ICON] 面板图标，填 SF Symbol 名称，如 wifi、network、antenna.radiowaves.left.and.right\n② [ICON-COLOR] 面板图标颜色，十六进制色值，如 #34C759\n③ [TIMEOUT] 运营商查询的超时时间（秒）\n④ [EVENT_SCRIPT_NAME] 网络变化通知的脚本名；填 # 可禁用通知\n⑤ [EVENT_DELAY] 网络变化后延迟多久再查询（秒），建议 1-3\n⑥ [PANEL_NAME] 状态面板名称；填 # 可禁用面板\n⑦ [UPDATE-INTERVAL] 面板自动刷新间隔（秒），-1 为仅手动刷新
 
 [Script]
 # Event - 网络变化即时通知
