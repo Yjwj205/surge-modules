@@ -48,7 +48,7 @@ Loon 的旧版（`policy-switcher.plugin`）是每 5 分钟轮询一次；**准�
 - 没显式传 `target` 时按当前小时兜底：**12 点前用 `amTarget`，之后用 `pmTarget`**（和 `switch-exact.js` 一致，用于手动跑脚本）；
 - **幂等**：先读 `$surge.selectGroupDetails()` 的当前选中项，已经是目标就直接退出，不切换、不通知；
 - **切换后复核**：再读一次选中项，只有确认等于目标才发「策略已切换」，否则发失败通知（含当前值、目标值、可选的子策略列表）；
-- 成功通知：标题 `策略已切换`，正文 `目标 · 准点 09:00`，约 10 秒自动消失；失败通知常驻。
+- 成功通知：标题 `策略已切换`，正文 `目标 · 准点 09:00`；不设 `auto-dismiss`，通知留在通知中心不自动清除。
 
 ## 与 Loon 版的 API 映射
 
@@ -58,7 +58,7 @@ Loon 的旧版（`policy-switcher.plugin`）是每 5 分钟轮询一次；**准�
 | `$config.setSelectPolicy(GROUP, target)` | `$surge.setSelectGroupPolicy(组, 子策略)`，老版本回退 `POST /v1/policy_groups/select` |
 | `cron ${amTime} then script(...)` | `type=cron, cronexp="{{{amTime}}}"` |
 | —— | `wake-system=1`（iOS 到点唤醒 Surge） |
-| `$notification.post(...)` | `$notification.post(title, subtitle, body, {"auto-dismiss": true})` |
+| `$notification.post(...)` | `$notification.post(title, subtitle, body)`（不传 auto-dismiss） |
 
 ## 已知限制
 
