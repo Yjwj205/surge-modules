@@ -21,7 +21,7 @@ Surge 模块与脚本合集。
 
 ## policy-switcher/ 模块
 
-定时切换策略·准点：默认 09:00 → Matrix，19:00 → 吹雪云观影组，基于 `$surge.setSelectGroupPolicy()`（老版本回退 HTTP API），
+定时切换策略·准点：占位默认 09:00 → B、19:00 → C（装好后改成自己的节点），基于 `$surge.setSelectGroupPolicy()`（老版本回退 HTTP API），
 两条准点 cron，不轮询；切换前判重、切换后复核。
 
 安装：`https://raw.githubusercontent.com/Yjwj205/surge-modules/main/policy-switcher/policy-switcher.sgmodule`
