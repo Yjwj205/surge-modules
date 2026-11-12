@@ -140,6 +140,9 @@
   function apply(before) {
     if (before && before.current === target) {
       log(GROUP + " 已是 " + target + "，无需切换");
+      if (NOTIFY) {
+        notify("已在目标策略", GROUP, target + " · 准点 " + new Date().toTimeString().slice(0, 5) + "（未切换）");
+      }
       return done();
     }
 
