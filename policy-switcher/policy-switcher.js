@@ -315,9 +315,7 @@ function renderPanel() {
         done({
             title: SCRIPT_TAG,
             content: lines.join("\n"),
-            style: style,
-            icon: "arrow.triangle.swap",
-            "icon-color": "0A84FF"
+            style: style
         });
     });
 }
