@@ -17,9 +17,9 @@
 
 (function () {
   var cfg = {
-    group: "综合利用EMBY4837",
-    amTarget: "Matrix",
-    pmTarget: "吹雪云观影组",
+    group: "A",
+    amTarget: "B",
+    pmTarget: "C",
     notify: true
   };
   var given = {};
@@ -140,9 +140,7 @@
   function apply(before) {
     if (before && before.current === target) {
       log(GROUP + " 已是 " + target + "，无需切换");
-      if (NOTIFY) {
-        notify("已在目标策略", GROUP, target + " · 准点 " + new Date().toTimeString().slice(0, 5) + "（未切换）");
-      }
+      if (NOTIFY) notify("已在目标策略", GROUP, "");
       return done();
     }
 
