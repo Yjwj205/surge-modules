@@ -1,0 +1,33 @@
+#!name=Fuck Telegram bad IPs（多目标合并）
+#!desc=把 Telegram 的垃圾 IP 映射到多个好 IP，Surge 每条连接从列表里随机挑一个
+#!author=Repcz（原版）/ Yjwj205 / Minis
+#!homepage=https://github.com/Yjwj205/surge-modules
+#!category=网络
+#!arguments=ip1:91.108.56.147,ip2:91.108.56.201,ip3:91.108.56.180
+#!arguments-desc=三个候选目标 IP，[Host] 里按 "ip1,ip2,ip3" 一起写。Surge 官方文档：记录有多条地址时，每次请求随机挑一条（不是测速择优）。想只用某个 IP，把三个都填成同一个即可。
+
+# 原版：https://github.com/Repcz/Tool/raw/X/Surge/Module/Function/FKTG.sgmodule
+# 本模块把原版「每个坏 IP → .147,.201」扩成「每个坏 IP → 三个好 IP」，
+# 由 Surge 在建立连接时随机取一个（文档原文：If the record has multiple addresses,
+# one is chosen at random. 见 manual.nssurge.com/dns/local-dns-mapping.html）。
+#
+# 三个目标 IP 都在新加坡 DC5（AS62014 Telegram），实测 443 通、`GET /` 回 404 nginx。
+# 只用其中一个可在模块参数里把 ip1/ip2/ip3 填成同一个。
+#
+# use-local-host-item-for-proxy = true 等价于让代理连接也吃这份 IP 映射，
+# Telegram 走代理时必须开，否则映射会被绕过。
+
+[General]
+use-local-host-item-for-proxy = true
+
+[Host]
+# Fuck Telegram bad ips -> {{{ip1}}} / {{{ip2}}} / {{{ip3}}}
+91.108.56.100 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.101 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.104 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.107 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.120 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.125 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.126 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.128 = {{{ip1}}},{{{ip2}}},{{{ip3}}
+91.108.56.156 = {{{ip1}}},{{{ip2}}},{{{ip3}}

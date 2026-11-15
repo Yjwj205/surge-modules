@@ -9,6 +9,7 @@ Surge 模块与脚本合集。
 | [`kelee/`](kelee/README.md) | 可莉（kelee.one）Loon 插件中心 275 个插件全量转换的 Surge 模块 |
 | [`checkin/`](checkin/README.md) | iKuuu 每日签到、NodeSeek 签到增强版（Loon 签到插件转 Surge） |
 | [`policy-switcher/`](policy-switcher/README.md) | 定时切换策略·准点：两条准点 cron 切换 select 策略组（Loon `policy-exact.plugin` 移植） |
+| [`fktg/`](fktg/README.md) | Fuck Telegram bad IPs：`[Host]` 把 TG 坏 IP 映射到多个好 IP（多目标合并版） |
 | 根目录 | 网络状态面板等自用模块（`net-status.*`） |
 
 ## kelee/ 模块
@@ -27,3 +28,13 @@ Surge 模块与脚本合集。
 安装：`https://raw.githubusercontent.com/Yjwj205/surge-modules/main/policy-switcher/policy-switcher.sgmodule`
 
 详见 [policy-switcher/README.md](policy-switcher/README.md)。
+
+## fktg/ 模块
+
+把 Telegram 的垃圾 IP 映射到多个好 IP（`.147 / .201 / .180`，都是新加坡 DC5）。
+**一条映射写多个目标时，Surge 是「每次请求随机挑一个」**，官方文档原话是
+*If the record has multiple addresses, one is chosen at random.* —— 不是测速择优。
+
+安装：`https://raw.githubusercontent.com/Yjwj205/surge-modules/main/fktg/FKTG.sgmodule`
+
+详见 [fktg/README.md](fktg/README.md)。
