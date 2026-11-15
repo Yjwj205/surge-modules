@@ -32,8 +32,11 @@ Surge 模块与脚本合集。
 ## fktg/ 模块
 
 把 Telegram 的垃圾 IP 映射到多个好 IP（`.147 / .201 / .180`，都是新加坡 DC5）。
-**一条映射写多个目标时，Surge 是「每次请求随机挑一个」**，官方文档原话是
-*If the record has multiple addresses, one is chosen at random.* —— 不是测速择优。
+
+**多目标时 Surge 怎么挑，文档只写了一部分**：`[Host]` 多地址在「域名命中映射 → 走代理」
+这条路径上是随机取一个（官方原话 *If the record has multiple addresses, one is chosen at random.*）；
+Telegram 这种 **IP→IP 直连映射**文档没描述，也找不到「并发择优」的开关。
+实测方法见子目录 README。
 
 安装：`https://raw.githubusercontent.com/Yjwj205/surge-modules/main/fktg/FKTG.sgmodule`
 

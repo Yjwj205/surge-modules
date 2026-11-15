@@ -26,29 +26,46 @@ Surge → 首页 → 模块 → 右上角 `+` → URL → 填上面的地址 →
 `[Host]` 里写成 `坏IP = {{{ip1}}},{{{ip2}}},{{{ip3}}}`。
 只想用某一个 IP：把三个参数都填成同一个（不能留空，否则会拼出 `ip,,ip` 这种坏记录）。
 
-## 多地址到底怎么选？（查过官方文档）
+## 多地址到底怎么选？（查过官方文档，只查到一半）
 
-Surge 手册 <https://manual.nssurge.com/dns/local-dns-mapping.html>「Local DNS Mapping」：
+我第一版说「文档写了随机」——**那句话的适用范围要缩一下**，它管不到 IP→IP 这条路径。
 
-> Multiple addresses may be given as a comma-separated list, and IPv4 and IPv6 addresses may be mixed.
+Surge 手册 <https://manual.nssurge.com/dns/local-dns-mapping.html> 里那句原文：
 
+> After enabling this option, for requests whose target **domain** matches a local DNS mapping record,
+> Surge sends the proxy request with the mapped IP address instead of the domain.
 > **If the record has multiple addresses, one is chosen at random.**
-> （这一句在 *Use Local DNS Items for Proxied Requests* 一节的末尾，描述的正是
-> `use-local-host-item-for-proxy = true` 时的行为）
 
-也就是说：**Surge 不做测速、不做并发竞速，也不是「哪条快走哪条」**，而是每次
-（每条新连接）从列表里**随机**挑一个地址。Telegram 会同时开好几条长连接
-（主连接 / 媒体 / 上传），随机的结果就是连接被摊到三个 IP 上——某个 IP 慢，那部分连接就慢。
+它写在 *Use Local DNS Items for Proxied Requests* 一节，描述的是：
 
-Surge 里没有能把「择优」做进 IP 映射的开关：
+- 请求的目标是**域名**（不是 IP 字面量），
+- 命中 `[Host]` 记录的值是 IP，
+- 并且这个请求**走代理**（`use-local-host-item-for-proxy = true` 才发生），
 
-- `[IP Rewrite]` 只有 `reflect` / `reject` / `drop`，不能改目的地址；
-- 策略组的 `url-test` / `smart` / `load-balance` 只对**代理节点**生效，管不到 IP→IP 映射；
-- `[Host]` 只支持逗号列表，没有权重、没有探测。
+此时 Surge 要把「映射后的 IP」塞进代理请求里，只能挑一个 → 随机挑。
 
-所以「合并成一个模块」的收益是**分摊 + 冗余**（三个都活着时不会因为某一个挂了就全废），
-不是「自动走最快」。要确定性地只用最快那个，还是得像 Loon 那边一样单选一个 IP
-（本模块把三个参数填成同一个即可，或者手动改 `[Host]` 目标）。
+而 Telegram 连的是 **IP 字面量**（`91.108.56.x:443`），不经过域名解析，也不在
+「domain matches a local DNS mapping record」这句话的范围内。**文档没有描述 IP→IP 映射
+在多目标时怎么选。** 我上一轮把它套到 IP→IP 上，是过度推断，撤回。
+
+文档里能查到的、和「挑地址」有关的其它行为：
+
+| 机制 | 文档描述 | 是择优吗 |
+| --- | --- | --- |
+| `prefer-v4` / `prefer-v6` | 建立 TCP 连接时先用偏好的地址族，**3 秒**连不上再开始试另一族 | 是「按族竞速」，不是延迟择优 |
+| `[MTProto]` 内建代理 | 一个 DC 有多个 endpoint，**某个地址失败**就被标记、下次换下一个 | 失败回退，不是延迟择优 |
+| 策略组 `url-test` / `smart` | 自动选延迟最低的**代理节点** | 只作用于节点，管不到 IP 映射 |
+| `[IP Rewrite]` | 只有 `reflect` / `reject` / `drop` | 不能改目的地址 |
+
+所以：**「并发、谁快走谁」在 Surge 文档里没有任何依据**；同时「随机」也只被证实于
+「域名 → 代理 IP」这条路径。IP→IP 多目标到底怎么挑，属于未文档化的实现细节，
+只能实测：装好后在 Surge 的**请求列表**里看 Telegram 那几条连接的目的地址——
+
+- 三个 IP 轮着出现 → 分摊/随机；
+- 永远只用第一个 → 顺序取首个（那就把最想要的那个写在 `ip1`）；
+- 只在第一个连不上时才出现第二个 → 失败回退。
+
+有结论后告诉我，我把这段 README 改成实测结果。
 
 ## 坏 IP 列表
 
@@ -74,6 +91,6 @@ Surge 里没有能把「择优」做进 IP 映射的开关：
 
 | | Surge（本模块） | Loon |
 | --- | --- | --- |
-| 一条映射能否写多个目标 | ✅ `ip1,ip2,ip3`，随机挑一个 | ❌ 每条只能一个目标 IP |
+| 一条映射能否写多个目标 | ✅ `ip1,ip2,ip3`（挑选规则文档未写明） | ❌ 每条只能一个目标 IP |
 | 换目标 | 改模块参数 | 换装另一个变体插件（`fktg.plugin` / `fktg-201.plugin` / `fktg-180.plugin`） |
 | 代理连接也吃映射 | `[General] use-local-host-item-for-proxy = true` | 每条尾部 `,use-in-proxy=true` |
