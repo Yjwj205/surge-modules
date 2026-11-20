@@ -74,7 +74,7 @@ try {
   }
   var isSurge = typeof $environment !== "undefined" && $environment && !!$environment["surge-version"];
   // Surge 信息面板（[Panel] + script-name）触发时 $input.purpose === "panel"：
-  // 结果画在卡片里，不弹通知，方便手动点刷新做一次签到测试
+  // 结果同时画在卡片里并照常发通知，方便手动点刷新做一次签到测试
   var isPanel = typeof $input !== "undefined" && $input && $input.purpose === "panel";
   var requestNode = (args.requestNode === null || args.requestNode === undefined)
     ? "" : String(args.requestNode).trim();
@@ -143,9 +143,8 @@ try {
       console.log("[iKuuu] 今天已经提醒过 Cookie 即将过期");
       return;
     }
-    if (!notifyEnabled || isPanel) {
-      console.log("[iKuuu] Cookie 即将过期（" + formatTs(ts) + "），" +
-        (isPanel ? "面板模式不打扰" : "通知已关闭"));
+    if (!notifyEnabled) {
+      console.log("[iKuuu] Cookie 即将过期（" + formatTs(ts) + "），通知已关闭");
       return;
     }
 
@@ -204,15 +203,6 @@ try {
     var info = expireText();
     if (info) text += "\n" + info;
 
-    // 面板模式：只更新卡片，不弹通知（手动测试用）
-    if (isPanel) {
-      var style = "error";
-      if (subtitle === "签到成功") style = "good";
-      else if (subtitle === "今日已签到") style = "info";
-      console.log("[iKuuu][panel] " + subtitle + " | " + text.replace(/\n/g, " / "));
-      return $done({ title: "iKuuu 签到", content: subtitle + "\n" + text, style: style });
-    }
-
     if (notifyEnabled) {
       try {
         if (isSurge && autoDismiss) {
@@ -224,7 +214,16 @@ try {
         console.log("[iKuuu] 通知发送失败：" + e);
       }
     }
-    console.log("[iKuuu] " + subtitle + " | " + text.replace(/\n/g, " / "));
+    console.log("[iKuuu]" + (isPanel ? "[panel]" : "") + " " + subtitle + " | " + text.replace(/\n/g, " / "));
+
+    // 面板模式：除了通知，再把结果画在卡片上
+    if (isPanel) {
+      var style = "error";
+      if (subtitle === "签到成功") style = "good";
+      else if (subtitle === "今日已签到") style = "info";
+      return $done({ title: "iKuuu 签到", content: subtitle + "\n" + text, style: style });
+    }
+
     $done({ content: subtitle + "\n" + text });
   }
 

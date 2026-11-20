@@ -221,7 +221,9 @@ console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
     postData: OK,
     getData: userPage
   });
-  ok("面板模式不弹通知", r.notes.length === 0, JSON.stringify(r.notes));
+  ok("面板模式照常发通知", r.notes.length === 1, JSON.stringify(r.notes));
+  ok("通知标题固定", r.notes[0] && r.notes[0].title === "iKuuu 签到");
+  ok("通知内容是签到结果", r.notes[0] && r.notes[0].subtitle === "签到成功");
   const out = r.doneCalls[0] || {};
   ok("返回面板标题", out.title === "iKuuu 签到", String(out.title));
   ok("返回面板正文（含签到结果）", /签到成功/.test(out.content || ""), out.content);
@@ -235,6 +237,7 @@ console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
     postError: "Error: certificate verify failed"
   });
   const out = r.doneCalls[0] || {};
+  ok("失败时也发通知", r.notes.length === 1, JSON.stringify(r.notes));
   ok("失败时 style=error", out.style === "error", String(out.style));
   ok("面板正文说明原因", /TLS/.test(out.content || ""), out.content);
 }
@@ -246,6 +249,17 @@ console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
     postData: JSON.stringify({ ret: 0, msg: "您今日已经签到过了" })
   });
   ok("已签到 style=info", (r.doneCalls[0] || {}).style === "info", String((r.doneCalls[0] || {}).style));
+}
+
+{
+  const r = run({
+    argument: "cookie=" + encodeURIComponent("uid=1; key=abc") + "&notify=false",
+    input: { purpose: "panel", position: "policy-selection", panelName: "iKuuu-Checkin" },
+    postData: OK,
+    getData: userPage
+  });
+  ok("notify=false 时面板也不弹", r.notes.length === 0, JSON.stringify(r.notes));
+  ok("但卡片照常返回结果", /签到成功/.test((r.doneCalls[0] || {}).content || ""));
 }
 
 console.log("\n结果：" + pass + " 通过 / " + fail + " 失败\n");

@@ -33,7 +33,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 
 抓取有两条路径：已登录状态下访问任意 ikuuu 页面（请求头 Cookie），以及登录瞬间的响应 `Set-Cookie`。抓不到时会提示原因（10 分钟限一次）。
 
-**手动签到**：策略组页有「iKuuu 签到」信息面板（模块里的 `[Panel]`），点卡片右上角的刷新按钮就执行一次，结果直接画在卡片上（面板模式不弹通知）；也可以在 Surge「脚本」里长按 `iKuuu-CheckinManual` 运行（这条会发通知）。
+**手动签到**：策略组页有「iKuuu 签到」信息面板（模块里的 `[Panel]`），点卡片右上角的刷新按钮就执行一次：结果同时画在卡片上并照常发通知（把 `notify` 关掉则只画卡片）；也可以在 Surge「脚本」里长按 `iKuuu-CheckinManual` 运行。
 
 ### 与 Loon 版同步的内容
 
@@ -96,7 +96,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
   - iKuuu 签到（cron）：正常解析参数、发请求、`$done({content})`
   - iKuuu Cookie 抓取：`capture=false` 时正确短路、无请求
   - NodeSeek 抓取 / 签到两条路径均正常执行
-- iKuuu 签到脚本另有 `node test-ikuuu-surge.js`（35 条断言，模拟 Surge 运行时）：
+- iKuuu 签到脚本另有 `node test-ikuuu-surge.js`（40 条断言，模拟 Surge 运行时）：
   参数为非空字符串的解析、`none` 哨兵、`notify=false` 字符串静默、`requestNode → policy`、
   秒级超时、`auto-cookie=false`、CK 剩余天数、≤2 天到期提醒与当日去重、已过期、TLS 报错、
-  登录页判定、重复签到识别、信息面板模式（不弹通知 / title / style）
+  登录页判定、重复签到识别、信息面板模式（照常通知 + title / style）
