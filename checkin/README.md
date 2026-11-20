@@ -19,7 +19,9 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 |---|---|---|
 | `cookie` | 空 | 手动粘贴完整 Cookie，留空则用自动抓取保存的值 |
 | `capture` | `true` | Cookie 抓取开关，抓完可改 `false` |
-| `notify` | `true` | 签到结果通知 |
+| `notify` | `true` | 签到结果、抓取与到期提醒通知 |
+| `expireInfo` | `true` | 签到通知里显示 CK 剩余天数（读 Cookie 里的 `expire_in`）；关掉只保留「剩余 ≤2 天」的到期提醒 |
+| `requestNode` | 空 | 填 Surge 里已有的策略组/策略名（如 `节点选择`、`DIRECT`），留空跟随规则；偶发证书错误时用它固定节点排查 |
 | `autoDismiss` | `false` | 通知自动消失（Surge 内置约 10 秒，时长不可调）；`false` 为常驻通知中心。需 Surge iOS 5.11.0+ / Mac 5.7.0+ |
 | `cronExpr` | `0 8 * * *` | 5 段 cron，默认每天 08:00 |
 
@@ -32,6 +34,16 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 抓取有两条路径：已登录状态下访问任意 ikuuu 页面（请求头 Cookie），以及登录瞬间的响应 `Set-Cookie`。抓不到时会提示原因（10 分钟限一次）。
 
 模块只保留定时任务，没有手动面板；想立即跑一次，可在 Surge 的「脚本」里直接运行 `iKuuu-CheckinCron` 对应的脚本（或把 cron 时间临时改到下一分钟）。
+
+### 与 Loon 版同步的内容
+
+脚本与 [Loon 版 `ikuuu-checkin.js`](https://github.com/Yjwj205/loon-modules) 是同一个文件（双运行时），所以以下行为两边一致：
+
+- 通知内容：服务器 `msg` + 剩余流量 + `CK 剩余：N 天（到期时间）`
+- Cookie 里带 `expire_in` 且剩余 ≤ 2 天时，单独推一条「iKuuu Cookie 即将过期」（同一张票每天最多一次，换登录会重新计）
+- 请求失败（含偶发证书错误）自动重试 3 次，1.5s 间隔
+- 登录页 / `code 10001` 等返回的分类（签到成功 / 今日已签到 / Cookie 已失效 / 签到失败）
+- `requestNode`：Loon 下是 `$httpClient` 的 `node`，Surge 下映射为 `policy`
 
 ---
 
@@ -65,7 +77,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 | 定时 | `cron ${cronExpr}` | `type=cron, cronexp="{{{cronExpr}}}"`，附 `wake-system=1` |
 | 手动执行 | `generic`（Loon 内有运行入口） | 只保留 `cron` 定时；临时手动可改 cron 时间或用 Surge 脚本列表单跑 |
 | 抓取 | `http-request` 脚本 | `type=http-request`，`max-size=-1` |
-| 节点指定 | `options.node`（Loon 专有） | 仅在 Loon 环境传，Surge 自动忽略（`requestNode` 参数已从 Surge 模块移除） |
+| 节点指定 | `options.node`（Loon 专有） | Surge 用 `options.policy`（策略组/策略名），两边的参数名都叫 `requestNode` |
 | MitM | `[Mitm] hostname=` | `[MITM] hostname = %APPEND%`，只追加 |
 
 ## 已知限制
@@ -84,3 +96,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
   - iKuuu 签到（cron）：正常解析参数、发请求、`$done({content})`
   - iKuuu Cookie 抓取：`capture=false` 时正确短路、无请求
   - NodeSeek 抓取 / 签到两条路径均正常执行
+- iKuuu 签到脚本另有 `node test-ikuuu-surge.js`（28 条断言，模拟 Surge 运行时）：
+  参数为非空字符串的解析、`none` 哨兵、`notify=false` 字符串静默、`requestNode → policy`、
+  秒级超时、`auto-cookie=false`、CK 剩余天数、≤2 天到期提醒与当日去重、已过期、TLS 报错、
+  登录页判定、重复签到识别

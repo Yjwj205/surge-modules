@@ -5,26 +5,30 @@ try {
   }
 } catch (e) {}
 /**
- * iKuuu 自动签到（Loon cron / generic 脚本）
+ * iKuuu 自动签到（Surge / Loon 双运行时：cron + generic）
  *
  * 作者：Yjwj205 / Minis
  * 主页：https://github.com/Yjwj205
- * 仓库：https://github.com/Yjwj205/loon-modules
+ * 仓库：https://github.com/Yjwj205/loon-modules（Loon）/ surge-modules（Surge）
  *
- * 参数（插件 [Argument] 传入的对象）：
+ * 参数（Loon 传对象，Surge 传 "k=v&k2=v2" 字符串，脚本内统一解析）：
  *   cookie       可选，手动填写的 Cookie；留空则用 ikuuu-cookie.js 自动抓取的值
  *   notify       可选，是否发系统通知，默认 true
- *   requestNode  可选，节点名 / 策略组名 / DIRECT；留空跟随规则
+ *   expireInfo   可选，通知里显示 CK 剩余天数，默认 true
+ *   requestNode  可选，节点/策略组名；Surge 下作为 $httpClient 的 policy
  *
  * 流程：POST https://ikuuu.org/user/checkin → 解析 {ret, msg} → 再 GET /user 读剩余流量
  * 通知内容只保留：服务器 msg + 剩余流量（不加时间、不报今日已用）
  * 请求失败（含偶发证书错误）自动重试，最多 3 次。
+ * Cookie 里带 expire_in（Unix 秒），剩余 ≤ 2 天时单独提醒一次（每张票每天最多一次）。
  */
 (function () {
   "use strict";
 
   var HOST = "https://ikuuu.org";
   var COOKIE_KEY = "ikuuu_org_cookie";
+  var EXPIRE_WARN_KEY = "ikuuu_expire_warn";
+  var EXPIRE_WARN_DAYS = 2;
   var MAX_ATTEMPTS = 3;
   var UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) " +
     "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
@@ -45,9 +49,22 @@ try {
     return o;
   }
   var args = parseArgs(typeof $argument !== "undefined" ? $argument : "");
+
+  // Surge 传进来的是字符串 "true"/"false"，Loon 传布尔值，统一转
+  function isFalse(v) {
+    if (v === false) return true;
+    var s = String(v === undefined || v === null ? "" : v).trim().toLowerCase();
+    return s === "false" || s === "0" || s === "off" || s === "no";
+  }
+  function flag(v, def) {
+    if (v === undefined || v === null || String(v).trim() === "") return def;
+    return !isFalse(v);
+  }
+
   var manualCookie = (args.cookie === null || args.cookie === undefined)
     ? "" : String(args.cookie);
-  var notifyEnabled = args.notify !== false;
+  var notifyEnabled = flag(args.notify, true);
+  var expireInfo = flag(args.expireInfo, true);
   // Surge 的 auto-dismiss 是布尔开关（官方固定约 10 秒后消失，不支持自定义秒数）
   // true = 通知自动消失；false = 常驻通知中心。需要 Surge iOS 5.11.0+ / Mac 5.7.0+
   var autoDismiss = false;
@@ -55,7 +72,7 @@ try {
     var dismissVal = String(args.autoDismiss).trim().toLowerCase();
     autoDismiss = !(dismissVal === "false" || dismissVal === "0" || dismissVal === "off");
   }
-  var isSurge = typeof $environment !== "undefined" && $environment["surge-version"];
+  var isSurge = typeof $environment !== "undefined" && $environment && !!$environment["surge-version"];
   var requestNode = (args.requestNode === null || args.requestNode === undefined)
     ? "" : String(args.requestNode).trim();
 
@@ -74,36 +91,127 @@ try {
 
   var cookie = manualCookie || savedCookie;
 
+  /* ---------- Cookie 剩余有效期（站点在 Cookie 里带 expire_in，Unix 秒） ---------- */
+
+  function parseExpireTs(cookieStr) {
+    var m = String(cookieStr || "").match(/(?:^|;\s*)expire_in=([\d.]+)/);
+    if (!m) return 0;
+    var ts = Math.floor(parseFloat(m[1]));
+    if (ts > 1e12) ts = Math.floor(ts / 1000); // 万一站点改成毫秒
+    return ts > 0 ? ts : 0;
+  }
+
+  function pad2(n) {
+    return n < 10 ? "0" + n : String(n);
+  }
+
+  function formatTs(ts) {
+    var d = new Date(ts * 1000);
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) +
+      " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+  }
+
+  function todayStamp() {
+    var d = new Date();
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+
+  /**
+   * 剩余 ≤ 2 天时单独提醒一次（每张票每天最多提醒一次，重新登录换了 expire_in 会重新计）。
+   * 已过期不在这里提醒：签到请求会失败，由「Cookie 已失效」通知兜底。
+   */
+  function checkCookieExpire() {
+    var ts = parseExpireTs(cookie);
+    if (!ts) return;
+    var leftMs = ts * 1000 - Date.now();
+    if (leftMs <= 0) {
+      console.log("[iKuuu] Cookie 已在 " + formatTs(ts) + " 过期");
+      return;
+    }
+    var days = Math.ceil(leftMs / 86400000);
+    if (days > EXPIRE_WARN_DAYS) return;
+
+    var stamp = todayStamp() + "|" + ts;
+    var last = "";
+    try {
+      last = String($persistentStore.read(EXPIRE_WARN_KEY) || "");
+    } catch (e) {}
+    if (last === stamp) {
+      console.log("[iKuuu] 今天已经提醒过 Cookie 即将过期");
+      return;
+    }
+    if (!notifyEnabled) {
+      console.log("[iKuuu] Cookie 即将过期（" + formatTs(ts) + "），通知已关闭");
+      return;
+    }
+
+    try {
+      $persistentStore.write(stamp, EXPIRE_WARN_KEY);
+    } catch (e) {}
+    try {
+      $notification.post("iKuuu Cookie 即将过期", "还剩约 " + days + " 天",
+        "到期时间：" + formatTs(ts) + "\n" +
+        "请在 Safari 打开 https://ikuuu.org 重新登录一次；" +
+        "抓取 Cookie 开着会自动覆盖旧值，关着的话把新 Cookie 填到模块参数里。");
+    } catch (e) {
+      console.log("[iKuuu] 过期提醒发送失败：" + e);
+    }
+    console.log("[iKuuu] 已提醒 Cookie 即将过期：" + formatTs(ts));
+  }
+
+  /**
+   * 通知里显示 CK 剩余天数（模块里「CK 剩余天数」开关控制）。
+   * 没有 expire_in 或开关关闭时返回空串。
+   */
+  function expireText() {
+    if (!expireInfo) return "";
+    var ts = parseExpireTs(cookie);
+    if (!ts) return "";
+    var leftMs = ts * 1000 - Date.now();
+    if (leftMs <= 0) return "CK：已过期（" + formatTs(ts) + "）";
+    return "CK 剩余：" + Math.ceil(leftMs / 86400000) + " 天（" + formatTs(ts) + " 到期）";
+  }
+
   /**
    * 请求参数。
-   * insecure：Loon 对 ikuuu.org 的 MITM 会让脚本请求拿到 Loon CA 签的证书，必须跳过校验。
-   * node：可把请求固定到某个节点/策略组，用来排除线路或节点证书问题。
+   * insecure：ikuuu 域名在 MITM 列表里时，脚本请求可能拿到自签证书，跳过校验。
+   * policy（Surge）/ node（Loon）：把请求固定到某个节点或策略组，用来排除线路问题。
+   * timeout：Surge 单位是秒，Loon 是毫秒。
    */
   function requestOptions(url, headers) {
     var options = {
       url: url,
-      timeout: 15000,
+      timeout: isSurge ? 15 : 15000,
       insecure: true,
       headers: headers
     };
-    if (requestNode && typeof $loon !== "undefined") options.node = requestNode;
+    if (isSurge) {
+      // 用参数里的 Cookie，避免被 Surge 自己的 Cookie 存储覆盖成旧会话
+      options["auto-cookie"] = false;
+      if (requestNode) options.policy = requestNode;
+    } else if (requestNode) {
+      options.node = requestNode;
+    }
     return options;
   }
 
   function finish(subtitle, content) {
+    var text = String(content);
+    var info = expireText();
+    if (info) text += "\n" + info;
     if (notifyEnabled) {
       try {
         if (isSurge && autoDismiss) {
-          $notification.post("iKuuu 签到", subtitle, content, { "auto-dismiss": true });
+          $notification.post("iKuuu 签到", subtitle, text, { "auto-dismiss": true });
         } else {
-          $notification.post("iKuuu 签到", subtitle, content);
+          $notification.post("iKuuu 签到", subtitle, text);
         }
       } catch (e) {
         console.log("[iKuuu] 通知发送失败：" + e);
       }
     }
-    console.log("[iKuuu] " + subtitle + " | " + String(content).replace(/\n/g, " / "));
-    $done({ content: subtitle + "\n" + content });
+    console.log("[iKuuu] " + subtitle + " | " + text.replace(/\n/g, " / "));
+    $done({ content: subtitle + "\n" + text });
   }
 
   /* ---------- Base64 / UTF-8（站点页面被 base64 包在 var originBody 里） ---------- */
@@ -207,9 +315,9 @@ try {
       if (/certificate|SSL|TLS/i.test(errText)) {
         return finish("TLS 校验失败", [
           "签到请求连续 " + attempts + " 次没通过证书校验（insecure=true 已开启）。",
-          "① 在插件「请求节点」里指定一个节点/策略组，排除线路或节点证书问题；",
-          "② 检查 Loon 的 MITM 证书是否安装并在系统里信任；",
-          "③ 不需要自动抓 Cookie 的话，删掉插件源码里的 [Mitm] 段、改用手动 Cookie。",
+          "① 在模块「请求节点」里指定一个节点/策略组，排除线路或节点证书问题；",
+          "② 检查 Surge 的 MITM 证书是否安装并在系统里信任；",
+          "③ 不需要自动抓 Cookie 的话，删掉模块源码里的 [MITM] 段、改用手动 Cookie。",
           "",
           errText.slice(0, 160)
         ].join("\n"));
@@ -227,7 +335,7 @@ try {
     if (!json || typeof json !== "object") {
       if (status === 302 || /<html|<script/i.test(text)) {
         return finish("Cookie 已失效",
-          "服务器返回的是登录页，请在 Safari 重新登录 ikuuu.org（插件会自动更新 Cookie）。");
+          "服务器返回的是登录页，请在 Safari 重新登录 ikuuu.org（模块会自动更新 Cookie）。");
       }
       return finish("签到失败",
         "返回内容无法解析（HTTP " + status + "）：" + text.slice(0, 120));
@@ -276,10 +384,11 @@ try {
   if (!cookie) {
     return finish("没有 Cookie", [
       "还没拿到登录 Cookie。",
-      "① 把插件的「抓取 Cookie」开关打开，再在 Safari 打开 https://ikuuu.org 登录一次；",
-      "② 或在插件设置的 Cookie 里手动粘贴。"
+      "① 把模块的「抓取 Cookie」开关打开，再在 Safari 打开 https://ikuuu.org 登录一次；",
+      "② 或在模块参数里手动粘贴 Cookie。"
     ].join("\n"));
   }
 
+  checkCookieExpire();
   attemptCheckin(1);
 })();
