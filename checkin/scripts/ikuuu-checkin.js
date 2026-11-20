@@ -73,6 +73,9 @@ try {
     autoDismiss = !(dismissVal === "false" || dismissVal === "0" || dismissVal === "off");
   }
   var isSurge = typeof $environment !== "undefined" && $environment && !!$environment["surge-version"];
+  // Surge 信息面板（[Panel] + script-name）触发时 $input.purpose === "panel"：
+  // 结果画在卡片里，不弹通知，方便手动点刷新做一次签到测试
+  var isPanel = typeof $input !== "undefined" && $input && $input.purpose === "panel";
   var requestNode = (args.requestNode === null || args.requestNode === undefined)
     ? "" : String(args.requestNode).trim();
 
@@ -199,6 +202,16 @@ try {
     var text = String(content);
     var info = expireText();
     if (info) text += "\n" + info;
+
+    // 面板模式：只更新卡片，不弹通知（手动测试用）
+    if (isPanel) {
+      var style = "error";
+      if (subtitle === "签到成功") style = "good";
+      else if (subtitle === "今日已签到") style = "info";
+      console.log("[iKuuu][panel] " + subtitle + " | " + text.replace(/\n/g, " / "));
+      return $done({ title: "iKuuu 签到", content: subtitle + "\n" + text, style: style });
+    }
+
     if (notifyEnabled) {
       try {
         if (isSurge && autoDismiss) {

@@ -33,7 +33,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 
 抓取有两条路径：已登录状态下访问任意 ikuuu 页面（请求头 Cookie），以及登录瞬间的响应 `Set-Cookie`。抓不到时会提示原因（10 分钟限一次）。
 
-模块只保留定时任务，没有手动面板；想立即跑一次，可在 Surge 的「脚本」里直接运行 `iKuuu-CheckinCron` 对应的脚本（或把 cron 时间临时改到下一分钟）。
+**手动签到**：策略组页有「iKuuu 签到」信息面板（模块里的 `[Panel]`），点卡片右上角的刷新按钮就执行一次，结果直接画在卡片上（面板模式不弹通知）；也可以在 Surge「脚本」里长按 `iKuuu-CheckinManual` 运行（这条会发通知）。
 
 ### 与 Loon 版同步的内容
 
@@ -75,7 +75,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 | 参数传递 | `[Argument]` + `$argument` 对象 | 模块 `#!arguments` + `argument="k=v&k2=v2"`，脚本内自行解析（两个脚本都已加解析函数） |
 | 开关控制 | `with enable=${capture}` | Surge 无脚本级开关 → 改为把 `capture` 传入脚本，由脚本自行短路 |
 | 定时 | `cron ${cronExpr}` | `type=cron, cronexp="{{{cronExpr}}}"`，附 `wake-system=1` |
-| 手动执行 | `generic`（Loon 内有运行入口） | 只保留 `cron` 定时；临时手动可改 cron 时间或用 Surge 脚本列表单跑 |
+| 手动执行 | `generic`（Loon 内有运行入口） | `type=generic` + `[Panel]` 信息面板：策略组页点刷新即执行，也能在脚本列表单跑 |
 | 抓取 | `http-request` 脚本 | `type=http-request`，`max-size=-1` |
 | 节点指定 | `options.node`（Loon 专有） | Surge 用 `options.policy`（策略组/策略名），两边的参数名都叫 `requestNode` |
 | MitM | `[Mitm] hostname=` | `[MITM] hostname = %APPEND%`，只追加 |
@@ -96,7 +96,7 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
   - iKuuu 签到（cron）：正常解析参数、发请求、`$done({content})`
   - iKuuu Cookie 抓取：`capture=false` 时正确短路、无请求
   - NodeSeek 抓取 / 签到两条路径均正常执行
-- iKuuu 签到脚本另有 `node test-ikuuu-surge.js`（28 条断言，模拟 Surge 运行时）：
+- iKuuu 签到脚本另有 `node test-ikuuu-surge.js`（35 条断言，模拟 Surge 运行时）：
   参数为非空字符串的解析、`none` 哨兵、`notify=false` 字符串静默、`requestNode → policy`、
   秒级超时、`auto-cookie=false`、CK 剩余天数、≤2 天到期提醒与当日去重、已过期、TLS 报错、
-  登录页判定、重复签到识别
+  登录页判定、重复签到识别、信息面板模式（不弹通知 / title / style）

@@ -35,6 +35,8 @@ function run(opts) {
     console: { log: (...a) => logs.push(a.join(" ")) },
     setTimeout: (fn) => fn(),
     $environment: { "surge-version": "5.11.0", "device-model": "iPhone" },
+    $input: opts.input || undefined,
+    $trigger: opts.input ? "button" : undefined,
     $argument: opts.argument === undefined ? "" : opts.argument,
     $persistentStore: {
       read: (k) => (k in store ? store[k] : null),
@@ -208,6 +210,42 @@ console.log("\n[iKuuu][Surge] 异常路径");
     postData: JSON.stringify({ ret: 0, msg: "您今日已经签到过了" })
   });
   ok("重复签到识别为已签到", r.notes[0].subtitle === "今日已签到", r.notes[0].subtitle);
+}
+
+console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
+
+{
+  const r = run({
+    argument: "cookie=" + encodeURIComponent("uid=1; key=abc") + "&notify=true&expireInfo=true",
+    input: { purpose: "panel", position: "policy-selection", panelName: "iKuuu-Checkin" },
+    postData: OK,
+    getData: userPage
+  });
+  ok("面板模式不弹通知", r.notes.length === 0, JSON.stringify(r.notes));
+  const out = r.doneCalls[0] || {};
+  ok("返回面板标题", out.title === "iKuuu 签到", String(out.title));
+  ok("返回面板正文（含签到结果）", /签到成功/.test(out.content || ""), out.content);
+  ok("成功时 style=good", out.style === "good", String(out.style));
+}
+
+{
+  const r = run({
+    argument: "cookie=" + encodeURIComponent("uid=1; key=abc"),
+    input: { purpose: "panel", position: "policy-selection", panelName: "iKuuu-Checkin" },
+    postError: "Error: certificate verify failed"
+  });
+  const out = r.doneCalls[0] || {};
+  ok("失败时 style=error", out.style === "error", String(out.style));
+  ok("面板正文说明原因", /TLS/.test(out.content || ""), out.content);
+}
+
+{
+  const r = run({
+    argument: "cookie=" + encodeURIComponent("uid=1; key=abc"),
+    input: { purpose: "panel", position: "policy-selection", panelName: "iKuuu-Checkin" },
+    postData: JSON.stringify({ ret: 0, msg: "您今日已经签到过了" })
+  });
+  ok("已签到 style=info", (r.doneCalls[0] || {}).style === "info", String((r.doneCalls[0] || {}).style));
 }
 
 console.log("\n结果：" + pass + " 通过 / " + fail + " 失败\n");
