@@ -143,8 +143,9 @@ try {
       console.log("[iKuuu] 今天已经提醒过 Cookie 即将过期");
       return;
     }
-    if (!notifyEnabled) {
-      console.log("[iKuuu] Cookie 即将过期（" + formatTs(ts) + "），通知已关闭");
+    if (!notifyEnabled || isPanel) {
+      console.log("[iKuuu] Cookie 即将过期（" + formatTs(ts) + "），" +
+        (isPanel ? "面板模式不打扰" : "通知已关闭"));
       return;
     }
 
