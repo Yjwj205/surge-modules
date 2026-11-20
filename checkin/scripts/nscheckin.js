@@ -14,6 +14,12 @@ let useRandomReward = false; // 默认关闭随机鸡腿
 // Surge 的 auto-dismiss 是布尔开关（官方固定约 10 秒后消失，不支持自定义秒数）
 // true = 通知自动消失；false = 常驻通知中心。需要 Surge iOS 5.11.0+ / Mac 5.7.0+
 let autoDismiss = false;
+// Surge 信息面板（[Panel] + script-name）触发时，把最后一条通知同时画到卡片上
+const isPanel = typeof $input !== "undefined" && $input && $input.purpose === "panel";
+let panelState = null;
+const PANEL_TITLE = "⛩️ NodeSeek 签到";
+const PANEL_ICON = "checkmark.seal.fill";
+const PANEL_COLOR = "#34D399";
 const COOKIE_CACHE_KEY = "NS_LOON_COOKIE";
 const COOKIE_EXPIRY_KEY = "NS_LOON_COOKIE_EXPIRY";
 
@@ -74,6 +80,19 @@ function postNotify(title, subtitle, body) {
     } catch (e) {
         console.log("[NS签到] 通知发送失败：" + e);
     }
+
+    // 面板模式：只传 icon / icon-color（不传 style，否则会用 style 的内置图标）
+    if (isPanel) {
+        let color = PANEL_COLOR;
+        if (/⚠️|🟡/.test(subtitle)) color = "#FBBF24";
+        else if (/❌|🔴|失败/.test(subtitle)) color = "#FF6B6B";
+        panelState = {
+            title: PANEL_TITLE,
+            content: (subtitle ? subtitle + "\n" : "") + body,
+            icon: PANEL_ICON,
+            "icon-color": color
+        };
+    }
 }
 
 const isGetHeader = typeof $request !== "undefined";
@@ -86,7 +105,7 @@ const isGetHeader = typeof $request !== "undefined";
         await handleCheckin();
     }
 })().finally(() => {
-    $done({});
+    $done(isPanel && panelState ? panelState : {});
 });
 
 /**

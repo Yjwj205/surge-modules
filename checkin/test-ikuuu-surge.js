@@ -225,9 +225,10 @@ console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
   ok("通知标题固定", r.notes[0] && r.notes[0].title === "iKuuu 签到");
   ok("通知内容是签到结果", r.notes[0] && r.notes[0].subtitle === "签到成功");
   const out = r.doneCalls[0] || {};
-  ok("返回面板标题", out.title === "iKuuu 签到", String(out.title));
+  ok("返回面板标题", out.title === "🌸 iKuuu 签到", String(out.title));
   ok("返回面板正文（含签到结果）", /签到成功/.test(out.content || ""), out.content);
-  ok("成功时 style=good", out.style === "good", String(out.style));
+  ok("返回二次元图标", out.icon === "sparkles" && out["icon-color"] === "#FF7AC6", out.icon + " / " + out["icon-color"]);
+  ok("不带 style（否则内置图标顶掉）", out.style === undefined, String(out.style));
 }
 
 {
@@ -238,7 +239,7 @@ console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
   });
   const out = r.doneCalls[0] || {};
   ok("失败时也发通知", r.notes.length === 1, JSON.stringify(r.notes));
-  ok("失败时 style=error", out.style === "error", String(out.style));
+  ok("失败时图标不变", out.icon === "sparkles", String(out.icon));
   ok("面板正文说明原因", /TLS/.test(out.content || ""), out.content);
 }
 
@@ -248,7 +249,7 @@ console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
     input: { purpose: "panel", position: "policy-selection", panelName: "iKuuu-Checkin" },
     postData: JSON.stringify({ ret: 0, msg: "您今日已经签到过了" })
   });
-  ok("已签到 style=info", (r.doneCalls[0] || {}).style === "info", String((r.doneCalls[0] || {}).style));
+  ok("已签到图标不变", (r.doneCalls[0] || {}).icon === "sparkles", String((r.doneCalls[0] || {}).icon));
 }
 
 {

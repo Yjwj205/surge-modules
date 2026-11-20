@@ -1,5 +1,5 @@
 #!name=NodeSeek 签到增强版
-#!desc=NodeSeek 论坛每日自动签到，支持 TG 推送与 Cookie 过期提醒。开启抓取开关后访问个人主页即可抓取 Cookie。
+#!desc=NodeSeek 论坛每日自动签到，支持 TG 推送与 Cookie 过期提醒。开启抓取开关后访问个人主页即可抓取 Cookie。策略组页有「NodeSeek 签到」信息面板，点右上角刷新即可手动签到一次。
 #!author=Roddy-D (Loon 版) / 转 Surge: Yjwj205
 #!homepage=https://github.com/Roddy-D/Loon_plugins
 #!icon=https://raw.githubusercontent.com/Roddy-D/Loon_plugins/refs/heads/main/icon/nscheckin.png
@@ -10,6 +10,10 @@
 [Script]
 NodeSeek-CookieCapture = type=http-request, pattern=^https:\/\/www\.nodeseek\.com\/api\/account\/getInfo\/, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, argument="ENABLE_CAPTURE={{{ENABLE_CAPTURE}}}&autoDismiss={{{autoDismiss}}}", requires-body=0, max-size=0
 NodeSeek-Checkin = type=cron, cronexp="{{{CRON_TIME}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, argument="NS_COOKIE={{{NS_COOKIE}}}&TG_BOT_TOKEN={{{TG_BOT_TOKEN}}}&TG_USER_ID={{{TG_USER_ID}}}&TG_NOTIFY_ONLY_FAIL={{{TG_NOTIFY_ONLY_FAIL}}}&RANDOM_REWARD={{{RANDOM_REWARD}}}&autoDismiss={{{autoDismiss}}}", timeout=60, wake-system=1
+NodeSeek-CheckinManual = type=generic, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/nscheckin.js, argument="NS_COOKIE={{{NS_COOKIE}}}&TG_BOT_TOKEN={{{TG_BOT_TOKEN}}}&TG_USER_ID={{{TG_USER_ID}}}&TG_NOTIFY_ONLY_FAIL={{{TG_NOTIFY_ONLY_FAIL}}}&RANDOM_REWARD={{{RANDOM_REWARD}}}&autoDismiss={{{autoDismiss}}}", timeout=60
+
+[Panel]
+NS-Checkin = title="⛩️ NodeSeek 签到", content="点右上角刷新，立即签到一次 🍀", icon=checkmark.seal.fill, icon-color=#34D399, script-name=NodeSeek-CheckinManual
 
 [MITM]
 hostname = %APPEND% www.nodeseek.com

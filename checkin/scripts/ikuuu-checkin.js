@@ -218,10 +218,13 @@ try {
 
     // 面板模式：除了通知，再把结果画在卡片上
     if (isPanel) {
-      var style = "error";
-      if (subtitle === "签到成功") style = "good";
-      else if (subtitle === "今日已签到") style = "info";
-      return $done({ title: "iKuuu 签到", content: subtitle + "\n" + text, style: style });
+      // 只传 icon / icon-color（不传 style，否则会用 style 的内置图标）
+      return $done({
+        title: "🌸 iKuuu 签到",
+        content: subtitle + "\n" + text,
+        icon: "sparkles",
+        "icon-color": "#FF7AC6"
+      });
     }
 
     $done({ content: subtitle + "\n" + text });

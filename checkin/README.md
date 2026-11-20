@@ -13,6 +13,19 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 
 ---
 
+## 信息面板（策略组页）
+
+两个模块各带一张信息面板，点卡片右上角的刷新按钮就执行一次：**照常发通知**，结果同时画在卡片上。
+
+| 面板 | 图标 | 说明 |
+|---|---|---|
+| 🌸 iKuuu 签到 | `sparkles` · `#FF7AC6`（樱粉） | 立即签到，显示 msg / 剩余流量 / CK 剩余 |
+| ⛩️ NodeSeek 签到 | `checkmark.seal.fill` · `#34D399`（青绿） | 立即签到；失败时图标转红 `#FF6B6B` |
+
+Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次元感」是用标题里的 emoji + 粉/紫/青配色做的；想换风格直接改模块 `[Panel]` 里的 `title` / `icon` / `icon-color` 即可（`icon` 必须是有效 SF Symbol 名）。
+
+---
+
 ## iKuuu 每日签到
 
 | 参数 | 默认 | 说明 |
@@ -66,6 +79,8 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
 
 > 重复签到说明：NodeSeek 对当天已签到会返回 **HTTP 500 +「今天已完成签到，请勿重复操作」**。脚本已把这种情况识别为「✅ 今日已签到」，不再报错。
 
+**手动签到**：策略组页有「⛩️ NodeSeek 签到」信息面板（模块里的 `[Panel]`），点卡片右上角的刷新按钮即执行一次：照常发通知（含 TG），结果同时画在卡片上；也可以在 Surge「脚本」里长按 `NodeSeek-CheckinManual` 运行。
+
 ---
 
 ## 与 Loon 版的差异（转换时改了什么）
@@ -96,7 +111,8 @@ Surge → 首页「模块」→ 安装新模块 → 粘贴地址。装完在模�
   - iKuuu 签到（cron）：正常解析参数、发请求、`$done({content})`
   - iKuuu Cookie 抓取：`capture=false` 时正确短路、无请求
   - NodeSeek 抓取 / 签到两条路径均正常执行
-- iKuuu 签到脚本另有 `node test-ikuuu-surge.js`（40 条断言，模拟 Surge 运行时）：
-  参数为非空字符串的解析、`none` 哨兵、`notify=false` 字符串静默、`requestNode → policy`、
-  秒级超时、`auto-cookie=false`、CK 剩余天数、≤2 天到期提醒与当日去重、已过期、TLS 报错、
-  登录页判定、重复签到识别、信息面板模式（照常通知 + title / style）
+- `node test-ikuuu-surge.js`（41 条断言）：字符串参数解析、`none` 哨兵、`notify=false` 静默、
+  `requestNode → policy`、秒级超时、`auto-cookie=false`、CK 剩余天数、≤2 天到期提醒与当日去重、
+  已过期、TLS 报错、登录页判定、重复签到识别、信息面板（照常通知 + emoji 标题 / icon）
+- `node test-ns-surge.js`（15 条断言）：NodeSeek 面板签到成功 / 今日已签到 / 500 / 无 Cookie
+  四种结果的通知与卡片配色，以及非面板触发时 `$done({})` 不受影响
