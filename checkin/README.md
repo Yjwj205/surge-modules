@@ -105,6 +105,18 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 - **Cookie 里的特殊字符**：`argument` 用 `&` 分隔参数，Cookie 若含 `&` 会被截断（v2board / NodeSeek 的 Cookie 通常是 `a=b; c=d`，不含 `&`）。真遇到可在脚本里改用手动本地存储。
 - **`wake-system=1`**：允许 Surge 唤醒系统执行，耗电略增，可自行删掉该参数。
 - 两个模块都会走 MitM，需在 Surge 里启用 MitM 并安装/信任证书。
+- **脚本引擎**：模块所有脚本行都显式写了 `engine=jsc`。Surge 的 `engine` 默认是 `auto`，在 iOS 上**总是优先用 WebView**，每次运行都要拉一个独立 WebView 进程，初始化开销明显，简单的签到脚本会白白多花几百毫秒；JSC 引擎初始化快、调用延迟低，官方也建议「小型、频繁调用的简单脚本用 JSC」。这三条脚本都没用到 TextDecoder / crypto / fetch 等 WebAPI，可以安全用 JSC。若哪天脚本里引入 WebAPI，记得把对应行的 `engine=jsc` 改回 `engine=webview`。
+
+## 运行时长参考（手机实测网络部分）
+
+| 目标 | 单次新连接 | 说明 |
+|---|---|---|
+| www.nodeseek.com | ~85–150 ms | Cloudflare 边缘 |
+| ikuuu.org | ~185 ms（冷启动 ~570 ms） | 无缓存时首个请求偏慢 |
+| wb 面板（荃湾） | ~130 ms | 香港机房 |
+| api.telegram.org | ~800–1500 ms | 走代理出国，**TG 推送是 NS 签到耗时的大头** |
+
+结论：脚本本身的 JSON/HTML 解析只有几毫秒，运行时长主要由「引擎初始化 + 网络往返」构成。想再压缩，只能减少请求数（例如 NS 关掉 TG 推送、把 `TG_NOTIFY_ONLY_FAIL` 设为 `true`）。
 
 ## 校验
 
