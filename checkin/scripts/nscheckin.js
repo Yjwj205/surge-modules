@@ -22,6 +22,13 @@ const PANEL_ICON = "checkmark.seal.fill";
 const PANEL_COLOR = "#34D399";
 const COOKIE_CACHE_KEY = "NS_LOON_COOKIE";
 const COOKIE_EXPIRY_KEY = "NS_LOON_COOKIE_EXPIRY";
+// HTTP 层参数：Surge 的 $httpClient 默认超时很短（手册写 5s，实测约 10s），
+// 而 NodeSeek 在 0 点签到高峰偶尔「服务端已处理、响应迟迟不回」，会在本地报
+// HTTP request timeout 但实际已签到成功。这里显式放宽超时并做少量重试。
+// 签到接口是幂等的：重复签到只会返回「今天已完成签到」，重试不会出问题。
+const HTTP_TIMEOUT = 20;      // 单次请求超时（秒）
+const RETRY_MAX = 2;          // 失败后额外重试次数
+const RETRY_GAP_MS = 3000;    // 重试间隔（毫秒）
 
 // 精准解析 Loon 传入的 $argument 变量
 if (typeof $argument !== "undefined" && $argument) {
@@ -199,18 +206,32 @@ async function handleCheckin() {
         url: url,
         method: "POST",
         headers: headers,
-        body: ""
+        body: "",
+        timeout: HTTP_TIMEOUT
     };
 
-    try {
-        const resp = await fetchPromise(requestOpts);
-        await processResponse(resp);
-    } catch (error) {
-        const errStr = error?.error || error?.message || String(error);
-        console.log(`[NS签到] 网络请求出现异常: ${errStr}`);
-        postNotify("NS签到结果", "⚠️ 网络请求异常", errStr);
-        await sendTgNotify(`<b>⚠️ NodeSeek 签到系统/网络异常</b>\n\n详细信息: \n<code>${escapeHtml(errStr)}</code>`);
+    let lastError = null;
+    for (let attempt = 0; attempt <= RETRY_MAX; attempt++) {
+        if (attempt > 0) {
+            const gapSec = RETRY_GAP_MS / 1000;
+            console.log(`[NS签到] 🔁 ${gapSec}s 后第 ${attempt} 次重试...`);
+            await sleep(RETRY_GAP_MS);
+        }
+        try {
+            const resp = await fetchPromise(requestOpts);
+            await processResponse(resp);
+            return;
+        } catch (error) {
+            lastError = error;
+            const errStr = error?.error || error?.message || String(error);
+            console.log(`[NS签到] 第 ${attempt + 1}/${RETRY_MAX + 1} 次请求失败: ${errStr}`);
+        }
     }
+
+    const errStr = lastError?.error || lastError?.message || String(lastError);
+    console.log(`[NS签到] 网络请求出现异常: ${errStr}`);
+    postNotify("NS签到结果", "⚠️ 网络请求异常", errStr);
+    await sendTgNotify(`<b>⚠️ NodeSeek 签到系统/网络异常</b>\n\n详细信息: \n<code>${escapeHtml(errStr)}</code>`);
 }
 
 /**
@@ -285,6 +306,10 @@ function fetchPromise(request) {
             headers: request.headers || {}
         };
 
+        if (request.timeout) {
+            options.timeout = request.timeout;
+        }
+
         if (request.body !== undefined && request.body !== null) {
             options.body = request.body;
         }
@@ -308,6 +333,10 @@ function fetchPromise(request) {
             $httpClient.get(options, callback);
         }
     });
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function escapeHtml(unsafe) {
@@ -380,6 +409,7 @@ async function sendTgNotify(text) {
     const requestOpts = {
         url: tgUrl,
         method: "POST",
+        timeout: 15,
         headers: {
             "Content-Type": "application/json"
         },

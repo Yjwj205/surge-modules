@@ -27,7 +27,7 @@ function run(opts) {
     const calls = [];
     const ctx = {
       console: { log: (...a) => logs.push(a.join(" ")) },
-      setTimeout,
+      setTimeout: opts.fastTimers ? (fn, ms) => setTimeout(fn, 0) : setTimeout,
       $environment: { "surge-version": "5.11.0" },
       $argument: opts.argument === undefined ? "" : opts.argument,
       $input: opts.input || undefined,
@@ -37,7 +37,11 @@ function run(opts) {
       $httpClient: {
         post: (o, cb) => {
           calls.push(o);
-          cb(opts.error || null, { status: opts.status || 200 }, opts.body || "{}");
+          // opts.queue 可按顺序给出每次请求的结果，用于验证重试；缺省沿用基础结果
+          const q = opts.queue && opts.queue.length ? opts.queue.shift() : null;
+          if (q && q.error) return cb(q.error, null, null);
+          const base = q || opts;
+          cb(base.error || null, { status: base.status || 200 }, base.body || "{}");
         },
         get: (o, cb) => cb(null, { status: 200 }, "")
       },
@@ -95,6 +99,27 @@ const PANEL = { purpose: "panel", position: "policy-selection", panelName: "NS-C
     const r = await run({ argument: ARG, body: JSON.stringify({ message: "签到成功" }) });
     ok("照常发通知", r.notes.length === 1);
     ok("$done 空对象（不污染 cron 结果）", JSON.stringify(r.doneCalls[0]) === "{}", JSON.stringify(r.doneCalls[0]));
+  }
+
+  console.log("\n[NodeSeek][Surge] 超时与重试");
+  {
+    const r = await run({
+      argument: ARG, fastTimers: true,
+      queue: [{ error: "HTTP request timeout" }, { status: 200, body: JSON.stringify({ message: "签到成功" }) }]
+    });
+    ok("请求带上 20s 超时", r.calls[0] && r.calls[0].timeout === 20, String(r.calls[0] && r.calls[0].timeout));
+    ok("超时后自动重试", r.calls.length === 2, String(r.calls.length));
+    ok("重试成功照常通知", r.notes.length === 1 && /签到成功/.test(r.notes[0].subtitle + r.notes[0].content), JSON.stringify(r.notes));
+  }
+
+  console.log("\n[NodeSeek][Surge] 重试耗尽");
+  {
+    const r = await run({
+      argument: ARG, fastTimers: true,
+      queue: [{ error: "HTTP request timeout" }, { error: "HTTP request timeout" }, { error: "HTTP request timeout" }]
+    });
+    ok("最多 3 次请求", r.calls.length === 3, String(r.calls.length));
+    ok("最终报网络异常", r.notes.length === 1 && /网络请求异常/.test(r.notes[0].subtitle), JSON.stringify(r.notes));
   }
 
   console.log("\n结果：" + pass + " 通过 / " + fail + " 失败\n");

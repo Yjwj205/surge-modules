@@ -79,6 +79,8 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 
 > 重复签到说明：NodeSeek 对当天已签到会返回 **HTTP 500 +「今天已完成签到，请勿重复操作」**。脚本已把这种情况识别为「✅ 今日已签到」，不再报错。
 
+> **超时与重试**：签到请求显式带 `timeout: 20`（Surge `$httpClient` 默认只有 5~10 秒），网络层失败时最多再重试 2 次、间隔 3 秒。NodeSeek 高峰期偶尔「服务端已签到成功、响应迟迟不回」，旧版会直接报 `HTTP request timeout`；现在会重试，重试若撞上当天已签到也会按「✅ 今日已签到」处理。两个定时脚本的 `timeout` 同步放宽到 120 秒以容纳重试。
+
 **手动签到**：策略组页有「⛩️ NodeSeek 签到」信息面板（模块里的 `[Panel]`），点卡片右上角的刷新按钮即执行一次：照常发通知（含 TG），结果同时画在卡片上；也可以在 Surge「脚本」里长按 `NodeSeek-CheckinManual` 运行。
 
 ---
@@ -114,5 +116,5 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 - `node test-ikuuu-surge.js`（41 条断言）：字符串参数解析、`none` 哨兵、`notify=false` 静默、
   `requestNode → policy`、秒级超时、`auto-cookie=false`、CK 剩余天数、≤2 天到期提醒与当日去重、
   已过期、TLS 报错、登录页判定、重复签到识别、信息面板（照常通知 + emoji 标题 / icon）
-- `node test-ns-surge.js`（15 条断言）：NodeSeek 面板签到成功 / 今日已签到 / 500 / 无 Cookie
+- `node test-ns-surge.js`（20 条断言，含超时重试）：NodeSeek 面板签到成功 / 今日已签到 / 500 / 无 Cookie
   四种结果的通知与卡片配色，以及非面板触发时 `$done({})` 不受影响
