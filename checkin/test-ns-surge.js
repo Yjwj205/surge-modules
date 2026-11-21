@@ -53,7 +53,7 @@ function run(opts) {
   });
 }
 
-const ARG = "NS_COOKIE=" + encodeURIComponent(COOKIE) + "&TG_BOT_TOKEN=none&TG_USER_ID=none&TG_NOTIFY_ONLY_FAIL=false&RANDOM_REWARD=false&autoDismiss=false";
+const ARG = "NS_COOKIE=" + encodeURIComponent(COOKIE) + "&RANDOM_REWARD=false&autoDismiss=false";
 const PANEL = { purpose: "panel", position: "policy-selection", panelName: "NS-Checkin" };
 
 (async () => {

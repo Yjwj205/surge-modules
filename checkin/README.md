@@ -69,9 +69,6 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 | `CRON_TIME` | `1 0 * * *` | 签到执行时间（5 段 cron） |
 | `ENABLE_CAPTURE` | `true` | 抓取开关：打开后访问 NodeSeek 页面自动抓 Cookie |
 | `NS_COOKIE` | 空 | Cookie，抓取后自动保存在本地，也可手动粘贴 |
-| `TG_BOT_TOKEN` | 空 | 选填，Telegram Bot Token |
-| `TG_USER_ID` | 空 | 选填，接收消息的 User ID |
-| `TG_NOTIFY_ONLY_FAIL` | `false` | 仅失败时推送 TG |
 | `RANDOM_REWARD` | `false` | 随机奖励模式 |
 | `autoDismiss` | `false` | 通知自动消失（Surge 内置约 10 秒，时长不可调）；`false` 为常驻通知中心。需 Surge iOS 5.11.0+ / Mac 5.7.0+ |
 
@@ -81,7 +78,7 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 
 > **超时与重试**：签到请求显式带 `timeout: 20`（Surge `$httpClient` 默认只有 5~10 秒），网络层失败时最多再重试 2 次、间隔 3 秒。NodeSeek 高峰期偶尔「服务端已签到成功、响应迟迟不回」，旧版会直接报 `HTTP request timeout`；现在会重试，重试若撞上当天已签到也会按「✅ 今日已签到」处理。两个定时脚本的 `timeout` 同步放宽到 120 秒以容纳重试。
 
-**手动签到**：策略组页有「⛩️ NodeSeek 签到」信息面板（模块里的 `[Panel]`），点卡片右上角的刷新按钮即执行一次：照常发通知（含 TG），结果同时画在卡片上；也可以在 Surge「脚本」里长按 `NodeSeek-CheckinManual` 运行。
+**手动签到**：策略组页有「⛩️ NodeSeek 签到」信息面板（模块里的 `[Panel]`），点卡片右上角的刷新按钮即执行一次：照常发本地通知，结果同时画在卡片上；也可以在 Surge「脚本」里长按 `NodeSeek-CheckinManual` 运行。
 
 ---
 
@@ -114,9 +111,8 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 | www.nodeseek.com | ~85–150 ms | Cloudflare 边缘 |
 | ikuuu.org | ~185 ms（冷启动 ~570 ms） | 无缓存时首个请求偏慢 |
 | wb 面板（荃湾） | ~130 ms | 香港机房 |
-| api.telegram.org | ~800–1500 ms | 走代理出国，**TG 推送是 NS 签到耗时的大头** |
 
-结论：脚本本身的 JSON/HTML 解析只有几毫秒，运行时长主要由「引擎初始化 + 网络往返」构成。想再压缩，只能减少请求数（例如 NS 关掉 TG 推送、把 `TG_NOTIFY_ONLY_FAIL` 设为 `true`）。
+结论：脚本本身的 JSON/HTML 解析只有几毫秒，运行时长主要由「引擎初始化 + 网络往返」构成。想再压缩只能减少请求数（NS 已只发一次签到请求，TG 推送也已移除）。
 
 ## 校验
 
