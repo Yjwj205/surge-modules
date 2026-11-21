@@ -25,6 +25,9 @@ try {
 (function () {
   "use strict";
 
+  // 版本 + 分段计时：Surge 只显示总时长，用它分辨「启动/建连」与「接口本身」
+  var VERSION = "2026-11-22";
+  var T0 = Date.now();
   var HOST = "https://ikuuu.org";
   var COOKIE_KEY = "ikuuu_org_cookie";
   var EXPIRE_WARN_KEY = "ikuuu_expire_warn";
@@ -199,6 +202,7 @@ try {
   }
 
   function finish(subtitle, content) {
+    console.log("[iKuuu] " + VERSION + " 总耗时 " + (Date.now() - T0) + "ms");
     var text = String(content);
     var info = expireText();
     if (info) text += "\n" + info;
@@ -310,6 +314,7 @@ try {
           fetchTraffic(callback, attempt + 1);
         }, 1000);
       }
+      console.log("[iKuuu] 流量接口返回 t=" + (Date.now() - T0) + "ms");
       if (error || !data) return callback(null);
       var result = [];
       try {
@@ -387,6 +392,7 @@ try {
       "Origin": HOST,
       "X-Requested-With": "XMLHttpRequest"
     }), function (error, response, data) {
+      console.log("[iKuuu] 签到接口返回 t=" + (Date.now() - T0) + "ms");
       if (error && attempt < MAX_ATTEMPTS) {
         console.log("[iKuuu] 第 " + attempt + " 次请求失败：" + error + "，1.5 秒后重试");
         return setTimeout(function () {
@@ -405,6 +411,7 @@ try {
     ].join("\n"));
   }
 
+  console.log("[iKuuu] " + VERSION + " 启动，签到请求已发出 t=" + (Date.now() - T0) + "ms");
   checkCookieExpire();
   attemptCheckin(1);
 })();
