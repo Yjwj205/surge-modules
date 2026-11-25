@@ -263,5 +263,94 @@ console.log("\n[iKuuu][Surge] 信息面板（手动触发）");
   ok("但卡片照常返回结果", /签到成功/.test((r.doneCalls[0] || {}).content || ""));
 }
 
+
+console.log("\n[iKuuu][Surge] 先读流量再签到（parallel）");
+
+{
+  const r = run({
+    argument: "cookie=auth%3Dabc&notify=true&parallel=true",
+    postData: JSON.stringify({ ret: 1, msg: "你获得了 1767 MB流量" }),
+    getData: userPage
+  });
+  ok("parallel=true 先发流量请求",
+    r.calls[0] && r.calls[0].type === "get", JSON.stringify(r.calls.map((c) => c.type)));
+  ok("读完流量页才签到",
+    r.calls[1] && r.calls[1].type === "post", JSON.stringify(r.calls.map((c) => c.type)));
+  ok("通知里有加数行",
+    /页面·签到 12\.34GB\|\|1767MB/.test(r.notes[0].content), r.notes[0].content);
+  ok("剩余流量是页面 + 赠送",
+    /剩余流量：≈ 14\.07 GB/.test(r.notes[0].content), r.notes[0].content);
+  ok("日志记下加法三个数",
+    r.logs.some((l) => /剩余流量 页面=12\.34 GB 签到=1767 MB 合计=14\.07 GB/.test(l)),
+    JSON.stringify(r.logs));
+}
+
+{
+  const r = run({
+    argument: "cookie=auth%3Dabc&notify=true&parallel=false",
+    postData: OK,
+    getData: userPage
+  });
+  ok("parallel=false 先签到再读",
+    r.calls[0].type === "post" && r.calls[1].type === "get",
+    JSON.stringify(r.calls.map((c) => c.type)));
+  ok("不加赠送、不显示 ≈", !/≈|页面·签到/.test(r.notes[0].content), r.notes[0].content);
+}
+
+{
+  // 流量页读不到也要签到，只是这次不报剩余流量
+  const r = run({
+    argument: "cookie=auth%3Dabc&notify=true&parallel=true",
+    postData: OK
+  });
+  ok("流量页失败照常签到", r.calls.some((c) => c.type === "post"),
+    JSON.stringify(r.calls.map((c) => c.type)));
+  ok("没有页面读数就不报剩余流量", !/剩余流量/.test(r.notes[0].content), r.notes[0].content);
+}
+
+console.log("\n[iKuuu][Surge] 抓取 Cookie 时报出有效期");
+
+function runCookie(opts) {
+  opts = opts || {};
+  const code = fs.readFileSync(path.join(__dirname, "scripts/ikuuu-cookie.js"), "utf8");
+  const notes = [];
+  const logs = [];
+  const store = Object.assign({}, opts.store || {});
+  const ctx = {
+    console: { log: (...a) => logs.push(a.join(" ")) },
+    $environment: { "surge-version": "5.11.0" },
+    $argument: opts.argument === undefined ? "" : opts.argument,
+    $request: { headers: opts.headers || {} },
+    $persistentStore: {
+      read: (k) => (k in store ? store[k] : null),
+      write: (v, k) => { store[k] = v; return true; }
+    },
+    $notification: { post: (t, s, c) => notes.push({ title: t, subtitle: s, content: c }) },
+    $done: () => {}
+  };
+  vm.createContext(ctx);
+  vm.runInContext(code, ctx);
+  return { notes, logs, store };
+}
+
+{
+  const ts = Math.floor(Date.now() / 1000) + 7 * 86400;
+  const r = runCookie({
+    argument: "notify=true&capture=true",
+    headers: { Cookie: "uid=1; email=a@b.c; key=abc; expire_in=" + ts }
+  });
+  ok("抓取通知显示剩余有效期", /剩余有效：7 天/.test(r.notes[0].content), r.notes[0].content);
+  ok("日志同步记一份", r.logs.some((l) => /剩余有效 7 天/.test(l)), JSON.stringify(r.logs));
+}
+
+{
+  const ts = Math.floor(Date.now() / 1000) + 30 * 86400;
+  const r = runCookie({
+    argument: "notify=true&capture=true",
+    headers: { Cookie: "uid=1; key=abc; expire_in=" + ts }
+  });
+  ok("站点改了时长也能照实报", /剩余有效：30 天/.test(r.notes[0].content), r.notes[0].content);
+}
+
 console.log("\n结果：" + pass + " 通过 / " + fail + " 失败\n");
 process.exit(fail ? 1 : 0);

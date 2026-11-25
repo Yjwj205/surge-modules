@@ -1,16 +1,16 @@
 #!name=iKuuu 每日签到
-#!desc=自动签到 ikuuu.org：可开关的 Cookie 自动抓取、每日定时签到，通知签到结果、剩余流量与 CK 剩余天数（剩余 ≤2 天单独提醒）。首次使用先打开「抓取 Cookie」并在 Safari 登录一次，也可直接填 Cookie。策略组页有「iKuuu 签到」信息面板，点右上角刷新即可手动签到一次。
+#!desc=自动签到 ikuuu.org：可开关的 Cookie 自动抓取、每日定时签到，通知签到结果、剩余流量与 CK 剩余天数（剩余 ≤2 天单独提醒）；可选的「先读流量再签到」会把今日赠送算进剩余流量。首次使用先打开「抓取 Cookie」并在 Safari 登录一次，也可直接填 Cookie。策略组页有「iKuuu 签到」信息面板，点右上角刷新即可手动签到一次。
 #!author=Yjwj205 / Minis
 #!homepage=https://github.com/Yjwj205/loon-modules
 #!category=签到
-#!arguments=cookie:none,capture:true,notify:true,expireInfo:true,requestNode:none,autoDismiss:false,cronExpr:0 8 * * *
-#!arguments-desc=参数说明（按参数顺序）\n\n① [cookie] 手动填写 Cookie；填 none 则使用自动抓取的值\n② [capture] 抓取开关：true 开启 / false 关闭；开启后打开 ikuuu.org 登录一次即自动抓取\n③ [notify] 通知开关：true 显示签到、抓取与到期提醒通知 / false 静默\n④ [expireInfo] 签到通知里显示 CK 剩余天数（依据 Cookie 里的 expire_in）；false 则只保留「剩余 ≤2 天」的快过期提醒\n⑤ [requestNode] 请求节点：填 Surge 里已有的策略组或策略名（如 节点选择 / DIRECT），留空跟随规则；偶发证书错误时固定到一个节点排查\n⑥ [autoDismiss] 通知自动消失：true 约 10 秒后消失 / false 常驻通知中心（Surge 内置时长，不可调）\n⑦ [cronExpr] 5 段 cron（分 时 日 月 周）；默认 0 8 * * *，即每天 08:00
+#!arguments=cookie:none,capture:true,notify:true,expireInfo:true,requestNode:none,autoDismiss:false,parallel:false,cronExpr:0 8 * * *
+#!arguments-desc=参数说明（按参数顺序）\n\n① [cookie] 手动填写 Cookie；填 none 则使用自动抓取的值\n② [capture] 抓取开关：true 开启 / false 关闭；开启后打开 ikuuu.org 登录一次即自动抓取\n③ [notify] 通知开关：true 显示签到、抓取与到期提醒通知 / false 静默\n④ [expireInfo] 签到通知里显示 CK 剩余天数（依据 Cookie 里的 expire_in）；false 则只保留「剩余 ≤2 天」的快过期提醒\n⑤ [requestNode] 请求节点：填 Surge 里已有的策略组或策略名（如 节点选择 / DIRECT），留空跟随规则；偶发证书错误时固定到一个节点排查\n⑥ [autoDismiss] 通知自动消失：true 约 10 秒后消失 / false 常驻通知中心（Surge 内置时长，不可调）\n⑦ [cronExpr] 5 段 cron（分 时 日 月 周）；默认 0 8 * * *，即每天 08:00\n⑧ [parallel] 先读流量再签到：true 时先读完流量页再发签到，剩余流量 = 页面读数 + 今日赠送（≈）；false 则签到后再读，数字就是官网口径
 
 [Script]
 iKuuu-CookieCapture = type=http-request, pattern=^https?:\/\/(?:www\.)?ikuuu\.org(?:[\/?]|$), script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-cookie.js, argument="notify={{{notify}}}&capture={{{capture}}}&autoDismiss={{{autoDismiss}}}", max-size=-1, engine=jsc
 iKuuu-LoginCookie = type=http-response, pattern=^https?:\/\/(?:www\.)?ikuuu\.org(?:[\/?]|$), script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-cookie.js, argument="notify={{{notify}}}&capture={{{capture}}}&autoDismiss={{{autoDismiss}}}", max-size=0, engine=jsc
-iKuuu-CheckinCron = type=cron, cronexp="{{{cronExpr}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-checkin.js, argument="cookie={{{cookie}}}&notify={{{notify}}}&expireInfo={{{expireInfo}}}&requestNode={{{requestNode}}}&autoDismiss={{{autoDismiss}}}", timeout=60, wake-system=1, engine=jsc
-iKuuu-CheckinManual = type=generic, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-checkin.js, argument="cookie={{{cookie}}}&notify={{{notify}}}&expireInfo={{{expireInfo}}}&requestNode={{{requestNode}}}&autoDismiss={{{autoDismiss}}}", timeout=60, engine=jsc
+iKuuu-CheckinCron = type=cron, cronexp="{{{cronExpr}}}", script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-checkin.js, argument="cookie={{{cookie}}}&notify={{{notify}}}&expireInfo={{{expireInfo}}}&requestNode={{{requestNode}}}&autoDismiss={{{autoDismiss}}}&parallel={{{parallel}}}", timeout=60, wake-system=1, engine=jsc
+iKuuu-CheckinManual = type=generic, script-path=https://raw.githubusercontent.com/Yjwj205/surge-modules/main/checkin/scripts/ikuuu-checkin.js, argument="cookie={{{cookie}}}&notify={{{notify}}}&expireInfo={{{expireInfo}}}&requestNode={{{requestNode}}}&autoDismiss={{{autoDismiss}}}&parallel={{{parallel}}}", timeout=60, engine=jsc
 
 [Panel]
 iKuuu-Checkin = title="🌸 iKuuu 签到", content="点右上角刷新，立即签到一次 ✨", icon=sparkles, icon-color=#FF7AC6, script-name=iKuuu-CheckinManual

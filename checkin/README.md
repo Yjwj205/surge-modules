@@ -36,6 +36,7 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 | `expireInfo` | `true` | 签到通知里显示 CK 剩余天数（读 Cookie 里的 `expire_in`）；关掉只保留「剩余 ≤2 天」的到期提醒 |
 | `requestNode` | 空 | 填 Surge 里已有的策略组/策略名（如 `节点选择`、`DIRECT`），留空跟随规则；偶发证书错误时用它固定节点排查 |
 | `autoDismiss` | `false` | 通知自动消失（Surge 内置约 10 秒，时长不可调）；`false` 为常驻通知中心。需 Surge iOS 5.11.0+ / Mac 5.7.0+ |
+| `parallel` | `false` | 先读流量再签到：`true` 时先 `GET /user` 拿到页面读数，再发签到，剩余流量 = 页面读数 + 今日赠送（显示为 ≈）。`false` 则签到后再读，数字就是官网口径 |
 | `cronExpr` | `0 8 * * *` | 5 段 cron，默认每天 08:00 |
 
 > 通知自动消失是 Surge 的内置能力（`auto-dismiss` 为布尔开关，官方固定约 10 秒后删除，不支持自定义时长），脚本发完通知就结束，不会常驻计时。
@@ -53,6 +54,10 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
 脚本与 [Loon 版 `ikuuu-checkin.js`](https://github.com/Yjwj205/loon-modules) 是同一个文件（双运行时），所以以下行为两边一致：
 
 - 通知内容：服务器 `msg` + 剩余流量 + `CK 剩余：N 天（到期时间）`
+- **`parallel`（先读流量再签到）**：打开后先读完流量页再发签到，页面必然早于赠送落库，`≈ 页面 + 赠送` 才成立；
+  默认关着就是签到后再读一次的官网口径
+- 每次运行的日志都会打 `Cookie 到期 YYYY-MM-DD HH:mm（剩 X 天）`；抓取 Cookie 成功的通知会写「剩余有效：X 天」
+- 流量页解析走字节级定位（只解码「剩余流量」附近的一小段），不再整页 base64 解码
 - Cookie 里带 `expire_in` 且剩余 ≤ 2 天时，单独推一条「iKuuu Cookie 即将过期」（同一张票每天最多一次，换登录会重新计）
 - 请求失败（含偶发证书错误）自动重试 3 次，1.5s 间隔
 - 登录页 / `code 10001` 等返回的分类（签到成功 / 今日已签到 / Cookie 已失效 / 签到失败）
@@ -121,8 +126,9 @@ Surge 的面板图标**只支持 SF Symbol，不能放图片**，所以「二次
   - iKuuu 签到（cron）：正常解析参数、发请求、`$done({content})`
   - iKuuu Cookie 抓取：`capture=false` 时正确短路、无请求
   - NodeSeek 抓取 / 签到两条路径均正常执行
-- `node test-ikuuu-surge.js`（41 条断言）：字符串参数解析、`none` 哨兵、`notify=false` 静默、
+- `node test-ikuuu-surge.js`（53 条断言）：字符串参数解析、`none` 哨兵、`notify=false` 静默、
   `requestNode → policy`、秒级超时、`auto-cookie=false`、CK 剩余天数、≤2 天到期提醒与当日去重、
-  已过期、TLS 报错、登录页判定、重复签到识别、信息面板（照常通知 + emoji 标题 / icon）
+  已过期、TLS 报错、登录页判定、重复签到识别、信息面板（照常通知 + emoji 标题 / icon）、
+  先读模式（先 GET 再 POST、加法显示、流量页失败仍照常签到）、抓取通知里的剩余有效期
 - `node test-ns-surge.js`（20 条断言，含超时重试）：NodeSeek 面板签到成功 / 今日已签到 / 500 / 无 Cookie
   四种结果的通知与卡片配色，以及非面板触发时 `$done({})` 不受影响
