@@ -34,7 +34,7 @@ export function MediumWidgetView({ result }: Props) {
   const globalPolicy = showControls && control?.mode === "proxy" ? control.globalPolicy : null
 
   return <VStack spacing={0} alignment="leading" frame={{ maxWidth: "infinity", maxHeight: "infinity", alignment: "topLeading" }} padding={{ horizontal: 14, top: 11, bottom: 8 }} widgetBackground={C.bg}>
-    <Header fetchedAt={snapshot.fetchedAt} cached={!live} inset={8} titleFont={12} mode={showControls ? control?.mode ?? null : null}/>
+    <Header fetchedAt={snapshot.fetchedAt} cached={!live} inset={8} titleFont={14} mode={showControls ? control?.mode ?? null : null}/>
 
     <HStack spacing={8} alignment="center" frame={{ maxWidth: "infinity" }} padding={{ top: 6 }}>
       <RateCard icon="arrow.down.circle.fill" label="累计下行" value={down} color={C.down}/>

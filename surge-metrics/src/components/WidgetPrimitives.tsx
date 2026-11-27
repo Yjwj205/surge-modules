@@ -105,7 +105,7 @@ export function Header({ fetchedAt, cached, inset = 0, titleFont = 11, mode = nu
   const updated = `${cached ? "缓存" : "更新"} ${formatFetchedAt(fetchedAt)}`
   return <HStack alignment="center" frame={{ maxWidth: "infinity" }} padding={{ horizontal: inset }}>
     <HStack spacing={5} alignment="center">
-      <Image filePath={`${Script.directory}/assets/surge-metrics-icon.png`} resizable scaleToFit frame={{ width: 15, height: 15 }}/>
+      <Image filePath={`${Script.directory}/assets/surge-metrics-icon.png`} resizable scaleToFit frame={{ width: titleFont + 3, height: titleFont + 3 }}/>
       <Text font={titleFont} fontWeight="bold" foregroundStyle={C.accent}>Surge</Text>
       {mode ? <ModeChip mode={mode}/> : null}
     </HStack>
