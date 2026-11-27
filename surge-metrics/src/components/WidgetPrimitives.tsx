@@ -35,14 +35,14 @@ export function ModeChip({ mode }: { mode: SurgeMode }) {
   const style = MODE_STYLE[mode] || MODE_STYLE.rule
   return <Button intent={CycleSurgeModeIntent(undefined)} buttonStyle="plain">
     <HStack
-      spacing={3}
+      spacing={4}
       alignment="center"
-      padding={{ horizontal: 6, vertical: 2 }}
+      padding={{ horizontal: 7, vertical: 3 }}
       background={style.bg}
       clipShape="capsule"
     >
-      <Image systemName={style.icon} resizable scaleToFit foregroundStyle={style.fg} frame={{ width: 9, height: 9 }}/>
-      <Text font={9} fontWeight="bold" foregroundStyle={style.fg} lineLimit={1}>{MODE_LABEL[mode] || mode}</Text>
+      <Image systemName={style.icon} resizable scaleToFit foregroundStyle={style.fg} frame={{ width: 11, height: 11 }}/>
+      <Text font={11} fontWeight="bold" foregroundStyle={style.fg} lineLimit={1}>{MODE_LABEL[mode] || mode}</Text>
     </HStack>
   </Button>
 }
@@ -64,7 +64,7 @@ export function PolicyChip({ policy, maxWidth = 148, interactive = true }: {
     {interactive
       ? <Image systemName="arrow.left.arrow.right" resizable scaleToFit foregroundStyle={C.secondary} frame={{ width: 8, height: 8 }}/>
       : <Image systemName="pin.fill" resizable scaleToFit foregroundStyle={C.tertiary} frame={{ width: 8, height: 8 }}/>}
-    <Text font={9} fontWeight="semibold" foregroundStyle={C.secondary} lineLimit={1} minScaleFactor={0.7}>{policy}</Text>
+    <Text font={10} fontWeight="semibold" foregroundStyle={C.secondary} lineLimit={1} minScaleFactor={0.7}>{policy}</Text>
   </HStack>
 
   return interactive
