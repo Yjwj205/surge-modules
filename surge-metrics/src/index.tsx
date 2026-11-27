@@ -72,6 +72,7 @@ export function App() {
   const [apiKey, setApiKey] = useState(initialConnection.apiKey)
   const [useTls, setUseTls] = useState(initialConnection.useTls)
   const [reloadMinutes, setReloadMinutes] = useState(String(initialSettings.reloadMinutes))
+  const [requestStat, setRequestStat] = useState<WidgetSettings["requestStat"]>(initialSettings.requestStat)
   const [status, setStatus] = useState(initialConnection.apiKey.trim() ? "已加载本地配置" : "请填写本机 Surge HTTP API")
   const [preview, setPreview] = useState<MetricsResult | null>(() => {
     const cache = getCachedMetrics()
@@ -104,6 +105,7 @@ export function App() {
     const minutes = Number(reloadMinutes)
     return setSettings({
       reloadMinutes: Number.isFinite(minutes) ? minutes : 5,
+      requestStat,
     })
   }
 
@@ -324,7 +326,7 @@ export function App() {
           <Toggle title="使用 HTTPS (http-api-tls)" value={useTls} onChanged={(value) => { setUseTls(value); markEdited() }} />
         </Section>
 
-        <Section header={<Text>小组件</Text>} footer={<Text>流量直接读取 Surge 原生累计 counter，引擎重启后归零。Medium 显示引擎核心总览；Large 额外展示累计流量最高的 3 个网络接口。</Text>}>
+        <Section header={<Text>小组件</Text>} footer={<Text>流量直接读取 Surge 原生累计 counter，引擎重启后归零。Medium 显示引擎核心总览；Large 额外展示累计流量最高的 3 个网络接口。Surge 没有官方的累计请求指标，「请求总数」取 /v1/requests/recent 中最大的请求 ID 作为估算，引擎重启后归零。</Text>}>
           <Picker
             title="请求刷新间隔"
             value={reloadMinutes}
@@ -336,6 +338,19 @@ export function App() {
             <Text tag="15">15 分钟</Text>
             <Text tag="30">30 分钟</Text>
             <Text tag="60">60 分钟</Text>
+          </Picker>
+
+          <Picker
+            title="请求统计"
+            value={requestStat}
+            onChanged={(value: string) => {
+              setRequestStat(value === "active" ? "active" : "total")
+              markEdited()
+            }}
+            pickerStyle="navigationLink"
+          >
+            <Text tag="total">请求总数（累计）</Text>
+            <Text tag="active">活跃请求（进行中）</Text>
           </Picker>
         </Section>
 

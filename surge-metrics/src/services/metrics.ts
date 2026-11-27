@@ -2,6 +2,7 @@ import {
   baseUrl,
   getCachedSnapshot,
   getConnection,
+  getSettings,
   metricsUrl,
   setCachedSnapshot,
 } from "./settings"
@@ -40,6 +41,50 @@ function parseNumber(raw: string): number | null {
 }
 
 /** Parse Surge's Prometheus text exposition. */
+/**
+ * Surge does not expose a cumulative request counter. The request list assigns
+ * an increasing numeric id to every request, so the largest id is a good
+ * estimate of "requests since the engine started".
+ */
+export function parseRequestTotal(json: unknown): number | null {
+  const candidates: unknown[] = []
+  let list: unknown[] | null = null
+
+  if (Array.isArray(json)) {
+    list = json
+  } else if (json && typeof json === "object") {
+    const obj = json as Record<string, unknown>
+    for (const key of ["total", "count", "request_total", "req_total", "total_requests"]) {
+      candidates.push(obj[key])
+    }
+    for (const key of ["requests", "data", "items"]) {
+      if (Array.isArray(obj[key])) {
+        list = obj[key] as unknown[]
+        break
+      }
+    }
+  }
+
+  let best: number | null = null
+  for (const value of candidates) {
+    const numeric = typeof value === "number" ? value : Number(value)
+    if (Number.isFinite(numeric) && numeric > 0) best = Math.max(best ?? 0, Math.floor(numeric))
+  }
+
+  if (list) {
+    for (const item of list) {
+      if (!item || typeof item !== "object") continue
+      const raw = (item as Record<string, unknown>).id
+      if (raw == null) continue
+      const numeric = typeof raw === "number" ? raw : Number(String(raw).trim())
+      if (!Number.isFinite(numeric) || numeric <= 0) continue
+      if (best == null || numeric > best) best = Math.floor(numeric)
+    }
+  }
+
+  return best
+}
+
 export function parsePrometheusText(text: string, fetchedAtMs = Date.now()): MetricSample {
   const sample: MetricSample = {
     fetchedAt: new Date(fetchedAtMs).toISOString(),
@@ -49,6 +94,7 @@ export function parsePrometheusText(text: string, fetchedAtMs = Date.now()): Met
     dnsCacheEntries: null,
     activeBans: null,
     build: { version: null, build: null },
+    requestTotal: null,
     interfaceInBytes: 0,
     interfaceOutBytes: 0,
     interfaceIn: {},
@@ -102,6 +148,7 @@ function buildSnapshot(curr: MetricSample): MetricsSnapshot {
   const version = curr.build.version || "—"
   return {
     fetchedAt: curr.fetchedAt,
+    requestTotal: curr.requestTotal ?? null,
     uptimeSeconds: curr.uptimeSeconds,
     memoryBytes: curr.memoryBytes,
     activeRequests: curr.activeRequests,
@@ -156,6 +203,35 @@ async function fetchMetricsText(connection: ConnectionConfig): Promise<
   }
 }
 
+async function fetchRequestTotal(connection: ConnectionConfig): Promise<number | null> {
+  try {
+    const response = await fetch(`${baseUrl(connection)}/v1/requests/recent`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "X-Key": connection.apiKey,
+        "Cache-Control": "no-cache, no-store",
+        Pragma: "no-cache",
+      },
+      timeout: 8,
+      allowInsecureRequest: !connection.useTls,
+      debugLabel: "SurgeRequests",
+    })
+    if (!response.ok) {
+      debug("requests.error", { status: response.status })
+      return null
+    }
+    const text = await response.text()
+    if (!text.trim()) return null
+    const total = parseRequestTotal(JSON.parse(text))
+    debug("requests.total", { total, bytes: text.length })
+    return total
+  } catch (error) {
+    debug("requests.fail", { message: redactDetail(error, connection) })
+    return null
+  }
+}
+
 export async function fetchMetrics(): Promise<MetricsResult> {
   const connection = getConnection()
   const cache = getCachedMetrics()
@@ -167,8 +243,12 @@ export async function fetchMetrics(): Promise<MetricsResult> {
     }
   }
 
-  debug("fetch.start", { host: connection.host, port: connection.port, useTls: connection.useTls })
-  const result = await fetchMetricsText(connection)
+  const wantsTotal = getSettings().requestStat !== "active"
+  debug("fetch.start", { host: connection.host, port: connection.port, useTls: connection.useTls, requestStat: wantsTotal ? "total" : "active" })
+  const [result, requestTotal] = await Promise.all([
+    fetchMetricsText(connection),
+    wantsTotal ? fetchRequestTotal(connection) : Promise.resolve(null),
+  ])
   if (!result.ok) {
     debug("fetch.error", { message: result.message, status: result.status })
     return {
@@ -179,7 +259,9 @@ export async function fetchMetrics(): Promise<MetricsResult> {
   }
 
   try {
-    const snapshot = buildSnapshot(parsePrometheusText(result.text))
+    const sample = parsePrometheusText(result.text)
+    sample.requestTotal = requestTotal
+    const snapshot = buildSnapshot(sample)
     setCachedSnapshot(snapshot)
     debug("fetch.ok", {
       interfaces: snapshot.interfaces.length,

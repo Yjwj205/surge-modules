@@ -75,3 +75,18 @@ export function maskKey(key: string): string {
   if (value.length <= 6) return `${value.slice(0, 1)}…${value.slice(-1)}`
   return `${value.slice(0, 3)}…${value.slice(-3)}`
 }
+
+/** 1436 → "1.4K"，1486 → "1.5K"，1000 → "1K"；四舍五入到一位小数。 */
+export function formatCount(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value) || value < 0) return "—"
+  const n = Math.round(value)
+  if (n < 1000) return String(n)
+  if (n < 999_950) {
+    const tenths = Math.round(n / 100)
+    const text = (tenths / 10).toFixed(1)
+    return `${text.endsWith(".0") ? text.slice(0, -2) : text}K`
+  }
+  const tenths = Math.round(n / 100_000)
+  const text = (tenths / 10).toFixed(1)
+  return `${text.endsWith(".0") ? text.slice(0, -2) : text}M`
+}

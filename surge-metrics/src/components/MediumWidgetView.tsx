@@ -1,6 +1,6 @@
 import { HStack, Spacer, Text, VStack, ZStack } from "scripting"
-import { formatBytes, formatMemory, formatUptime } from "../services/format"
-import { getCachedControl, getControlSettings } from "../services/settings"
+import { formatBytes, formatCount, formatMemory, formatUptime } from "../services/format"
+import { getCachedControl, getControlSettings, getSettings } from "../services/settings"
 import type { MetricsResult, MetricsSnapshot } from "../services/types"
 import { C, EmptyState, Header, PolicyChip, RateCard, StatusBlock, VersionLabel } from "./WidgetPrimitives"
 
@@ -24,7 +24,13 @@ export function MediumWidgetView({ result }: Props) {
   const down = formatBytes(snapshot.totalInBytes)
   const up = formatBytes(snapshot.totalOutBytes)
   const mem = formatMemory(snapshot.memoryBytes)
-  const active = snapshot.activeRequests == null ? "—" : String(Math.round(snapshot.activeRequests))
+  const wantsTotal = getSettings().requestStat !== "active"
+  const total = wantsTotal && snapshot.requestTotal != null ? snapshot.requestTotal : null
+  const requestValue = total != null
+    ? formatCount(total)
+    : snapshot.activeRequests == null ? "—" : formatCount(snapshot.activeRequests)
+  const requestLabel = total != null ? "请求总数" : "活跃请求"
+  const requestIcon = total != null ? "list.number" : "link"
   const dns = snapshot.dnsCacheEntries == null ? "—" : String(Math.round(snapshot.dnsCacheEntries))
   const uptime = formatUptime(snapshot.uptimeSeconds)
   const bans = snapshot.activeBans == null ? 0 : Math.max(0, Math.round(snapshot.activeBans))
@@ -47,7 +53,7 @@ export function MediumWidgetView({ result }: Props) {
     <HStack alignment="center" frame={{ maxWidth: "infinity" }} padding={{ top: 4, bottom: 4 }}>
       <StatusBlock icon="cpu" label="内存占用" value={mem} color={C.accent}/>
       <Spacer/>
-      <StatusBlock icon="link" label="活跃请求" value={active} color={C.accent}/>
+      <StatusBlock icon={requestIcon} label={requestLabel} value={requestValue} color={C.accent}/>
       <Spacer/>
       <StatusBlock icon="globe" label="DNS 缓存" value={dns} color={C.accent}/>
       <Spacer/>
