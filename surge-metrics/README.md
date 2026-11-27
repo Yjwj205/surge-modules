@@ -16,6 +16,12 @@ https://raw.githubusercontent.com/Yjwj205/surge-modules/main/surge-metrics/Surge
 
 也可以在 GitHub 文件页下载 `Surge-Metrics.scripting` 后在「文件」里点开，选择 Scripting 导入。
 
+如果保存到「文件」时扩展名被改成 `.bin`（iOS 不认识 `.scripting`），改用 zip 版，解压后得到 `.scripting`：
+
+```text
+https://raw.githubusercontent.com/Yjwj205/surge-modules/main/surge-metrics/Surge-Metrics.zip
+```
+
 > `.scripting` 不是系统已知扩展名，如果保存到「文件」时被改成了 `.bin`，长按重命名为 `.scripting` 再打开即可；文件本身就是一个 zip。
 
 ## 系统要求
@@ -73,6 +79,7 @@ WidgetKit 不支持下拉菜单，所以小组件上的模式 / 策略只能「�
 ```text
 surge-metrics/
 ├── Surge-Metrics.scripting     可直接导入的安装包
+├── Surge-Metrics.zip           zip 包装，解压后得到上面的 .scripting
 ├── src/                        源码（Scripting 项目结构）
 │   ├── index.tsx               设置页
 │   ├── widget.tsx              小组件入口（Medium / Large）
