@@ -11,7 +11,7 @@
   "entry": "index.tsx",
   "intentInputTypes": [],
   "description": "Medium and Large widgets for Surge iOS metrics with outbound mode / global policy control and K-formatted cumulative request count: traffic, memory, requests, DNS cache, uptime, interfaces.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "localizedDescriptions": {
     "zh": "Surge iOS Prometheus 指标小组件，并可在小组件上切换运行模式、在全局模式下切换节点或策略组：Medium 聚焦累计流量与核心状态，Large 展开网络接口流量。",
     "en": "Surge iOS metrics widgets with outbound mode and global policy control. Medium focuses on cumulative traffic and runtime status; Large adds per-interface traffic."

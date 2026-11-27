@@ -65,12 +65,13 @@ export function parseRequestTotal(json: unknown): number | null {
     }
   }
 
-  let best: number | null = null
+  // An explicit total/count field always wins over the id heuristic.
   for (const value of candidates) {
     const numeric = typeof value === "number" ? value : Number(value)
-    if (Number.isFinite(numeric) && numeric > 0) best = Math.max(best ?? 0, Math.floor(numeric))
+    if (Number.isFinite(numeric) && numeric > 0) return Math.floor(numeric)
   }
 
+  let best: number | null = null
   if (list) {
     for (const item of list) {
       if (!item || typeof item !== "object") continue

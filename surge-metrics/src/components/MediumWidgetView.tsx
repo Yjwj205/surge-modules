@@ -24,8 +24,10 @@ export function MediumWidgetView({ result }: Props) {
   const down = formatBytes(snapshot.totalInBytes)
   const up = formatBytes(snapshot.totalOutBytes)
   const mem = formatMemory(snapshot.memoryBytes)
-  const wantsTotal = getSettings().requestStat !== "active"
-  const total = wantsTotal && snapshot.requestTotal != null ? snapshot.requestTotal : null
+  const settings = getSettings()
+  const wantsTotal = settings.requestStat !== "active"
+  const rawTotal = wantsTotal && snapshot.requestTotal != null ? snapshot.requestTotal : null
+  const total = rawTotal != null ? Math.max(0, rawTotal - (settings.requestOffset || 0)) : null
   const requestValue = total != null
     ? formatCount(total)
     : snapshot.activeRequests == null ? "—" : formatCount(snapshot.activeRequests)

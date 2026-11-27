@@ -73,6 +73,8 @@ export function App() {
   const [useTls, setUseTls] = useState(initialConnection.useTls)
   const [reloadMinutes, setReloadMinutes] = useState(String(initialSettings.reloadMinutes))
   const [requestStat, setRequestStat] = useState<WidgetSettings["requestStat"]>(initialSettings.requestStat)
+  const [requestOffset, setRequestOffset] = useState(initialSettings.requestOffset)
+  const [calibration, setCalibration] = useState("")
   const [status, setStatus] = useState(initialConnection.apiKey.trim() ? "已加载本地配置" : "请填写本机 Surge HTTP API")
   const [preview, setPreview] = useState<MetricsResult | null>(() => {
     const cache = getCachedMetrics()
@@ -106,6 +108,7 @@ export function App() {
     return setSettings({
       reloadMinutes: Number.isFinite(minutes) ? minutes : 5,
       requestStat,
+      requestOffset,
     })
   }
 
@@ -258,6 +261,28 @@ export function App() {
     }
   }
 
+  function onCalibrate() {
+    const raw = preview ? (preview.ok ? preview.snapshot.requestTotal : preview.cache?.requestTotal) : null
+    const target = Number(calibration)
+    if (raw == null) {
+      setStatus("请先点「立即刷新并预览」拿到原始请求 ID")
+      return
+    }
+    if (!Number.isFinite(target) || target <= 0) {
+      setStatus("请填写 Surge 仪表盘当前显示的请求数")
+      return
+    }
+    const offset = Math.max(0, Math.round(raw) - Math.round(target))
+    const next = setSettings({
+      reloadMinutes: Number(reloadMinutes) || 5,
+      requestStat,
+      requestOffset: offset,
+    })
+    setRequestOffset(next.requestOffset)
+    setStatus(`已校准：原始 ${Math.round(raw)} − 偏移 ${next.requestOffset} = ${Math.max(0, Math.round(raw) - next.requestOffset)}`)
+    reloadWidgets()
+  }
+
   function onToggleControls(value: boolean) {
     const next = setControlSettings({ showControls: value })
     setControlSettingsState(next)
@@ -352,6 +377,21 @@ export function App() {
             <Text tag="total">请求总数（累计）</Text>
             <Text tag="active">活跃请求（进行中）</Text>
           </Picker>
+        </Section>
+
+        <Section
+          header={<Text>请求数校准</Text>}
+          footer={<Text>「请求总数」是 Surge 请求 ID 的估算值，和仪表盘可能差一个固定数（例如引擎重启前的 ID）。把 Surge 仪表盘当前显示的请求数填进来点校准，小组件会一直减去这个差值。当前偏移：{requestOffset}</Text>}
+        >
+          <HStack>
+            <Text>原始请求 ID</Text>
+            <Spacer/>
+            <Text foregroundStyle="secondaryLabel">
+              {preview ? String((preview.ok ? preview.snapshot.requestTotal : preview.cache?.requestTotal) ?? "—") : "—"}
+            </Text>
+          </HStack>
+          <TextField title="Surge 显示" value={calibration} onChanged={setCalibration} prompt="例如 2623" />
+          <Button title="校准" action={onCalibrate} />
         </Section>
 
         <Section

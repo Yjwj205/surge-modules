@@ -22,6 +22,7 @@ declare const Storage: {
 const DEFAULT_SETTINGS: WidgetSettings = {
   reloadMinutes: 5,
   requestStat: "total",
+  requestOffset: 0,
 }
 
 const DEFAULT_CONNECTION: ConnectionConfig = {
@@ -45,6 +46,10 @@ export function getSettings(): WidgetSettings {
           ? Math.min(Math.floor(value.reloadMinutes), 360)
           : DEFAULT_SETTINGS.reloadMinutes,
       requestStat: value.requestStat === "active" ? "active" : "total",
+      requestOffset:
+        typeof value.requestOffset === "number" && Number.isFinite(value.requestOffset) && value.requestOffset > 0
+          ? Math.min(Math.floor(value.requestOffset), 1_000_000_000)
+          : 0,
     }
   } catch {
     return { ...DEFAULT_SETTINGS }
@@ -62,6 +67,12 @@ export function setSettings(patch: Partial<WidgetSettings>): WidgetSettings {
       patch.requestStat === "active" || patch.requestStat === "total"
         ? patch.requestStat
         : current.requestStat,
+    requestOffset:
+      typeof patch.requestOffset === "number" && Number.isFinite(patch.requestOffset) && patch.requestOffset > 0
+        ? Math.min(Math.floor(patch.requestOffset), 1_000_000_000)
+        : patch.requestOffset === 0
+          ? 0
+          : current.requestOffset,
   }
   try {
     Storage.set(SETTINGS_KEY, next)
