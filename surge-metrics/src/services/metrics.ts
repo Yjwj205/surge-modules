@@ -4,6 +4,8 @@ import {
   getConnection,
   getSettings,
   metricsUrl,
+  noteRequestTotal,
+  recordApiCall,
   setCachedSnapshot,
 } from "./settings"
 import type {
@@ -96,6 +98,7 @@ export function parsePrometheusText(text: string, fetchedAtMs = Date.now()): Met
     activeBans: null,
     build: { version: null, build: null },
     requestTotal: null,
+    requestTotalRaw: null,
     interfaceInBytes: 0,
     interfaceOutBytes: 0,
     interfaceIn: {},
@@ -150,6 +153,7 @@ function buildSnapshot(curr: MetricSample): MetricsSnapshot {
   return {
     fetchedAt: curr.fetchedAt,
     requestTotal: curr.requestTotal ?? null,
+    requestTotalRaw: curr.requestTotalRaw ?? null,
     uptimeSeconds: curr.uptimeSeconds,
     memoryBytes: curr.memoryBytes,
     activeRequests: curr.activeRequests,
@@ -180,6 +184,7 @@ async function fetchMetricsText(connection: ConnectionConfig): Promise<
       allowInsecureRequest: !connection.useTls,
       debugLabel: "SurgeMetrics",
     })
+    recordApiCall()
     const text = await response.text()
     if (!response.ok) {
       return {
@@ -218,6 +223,7 @@ async function fetchRequestTotal(connection: ConnectionConfig): Promise<number |
       allowInsecureRequest: !connection.useTls,
       debugLabel: "SurgeRequests",
     })
+    recordApiCall()
     if (!response.ok) {
       debug("requests.error", { status: response.status })
       return null
@@ -260,8 +266,10 @@ export async function fetchMetrics(): Promise<MetricsResult> {
   }
 
   try {
+    const callState = noteRequestTotal(requestTotal)
     const sample = parsePrometheusText(result.text)
-    sample.requestTotal = requestTotal
+    sample.requestTotalRaw = requestTotal
+    sample.requestTotal = requestTotal == null ? null : Math.max(0, requestTotal - callState.count)
     const snapshot = buildSnapshot(sample)
     setCachedSnapshot(snapshot)
     debug("fetch.ok", {

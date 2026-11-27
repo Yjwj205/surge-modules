@@ -12,6 +12,7 @@ const SNAPSHOT_KEY = "surge_metrics_last_snapshot_v1"
 const CONTROL_KEY = "surge_metrics_control_snapshot_v1"
 const CONTROL_SETTINGS_KEY = "surge_metrics_control_settings_v1"
 const CATALOG_KEY = "surge_metrics_policy_catalog_v1"
+const API_CALLS_KEY = "surge_metrics_api_calls_v1"
 
 declare const Storage: {
   get<T = unknown>(key: string): T | null
@@ -251,4 +252,65 @@ export function setCachedCatalog(value: PolicyCatalog): void {
   } catch {
     /* ignore */
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Local API call accounting                                          */
+/* ------------------------------------------------------------------ */
+
+export type ApiCallState = {
+  /** HTTP requests this script has sent to Surge since the request ids restarted */
+  count: number
+  /** Highest request id observed so far, used to detect an id reset */
+  lastRawId: number | null
+}
+
+export function getApiCallState(): ApiCallState {
+  try {
+    const value = Storage.get<ApiCallState>(API_CALLS_KEY)
+    if (!isObject(value)) return { count: 0, lastRawId: null }
+    return {
+      count: typeof value.count === "number" && value.count > 0 ? Math.floor(value.count) : 0,
+      lastRawId: typeof value.lastRawId === "number" && value.lastRawId > 0 ? Math.floor(value.lastRawId) : null,
+    }
+  } catch {
+    return { count: 0, lastRawId: null }
+  }
+}
+
+export function setApiCallState(state: ApiCallState): void {
+  try {
+    Storage.set(API_CALLS_KEY, state)
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Every request we send to Surge is itself counted in Surge's request id
+ * sequence, so the widget would otherwise report its own polling as traffic.
+ */
+export function recordApiCall(): void {
+  const state = getApiCallState()
+  setApiCallState({ count: state.count + 1, lastRawId: state.lastRawId })
+}
+
+/** Call after a successful /v1/requests/recent read. */
+export function noteRequestTotal(raw: number | null): ApiCallState {
+  const state = getApiCallState()
+  if (raw == null) return state
+  if (state.lastRawId != null && raw < state.lastRawId * 0.8) {
+    // Request ids restarted (engine restart): start the ledger over and drop the
+    // calibration, which only described the previous run.
+    const reset: ApiCallState = { count: 0, lastRawId: raw }
+    setApiCallState(reset)
+    setSettings({ requestOffset: 0 })
+    return reset
+  }
+  const next: ApiCallState = {
+    count: state.count,
+    lastRawId: state.lastRawId == null ? raw : Math.max(state.lastRawId, raw),
+  }
+  setApiCallState(next)
+  return next
 }

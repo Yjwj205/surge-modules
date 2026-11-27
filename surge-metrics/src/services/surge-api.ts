@@ -5,6 +5,7 @@ import {
   getCachedControl,
   getConnection,
   getControlSettings,
+  recordApiCall,
   setCachedCatalog,
   setCachedControl,
 } from "./settings"
@@ -74,6 +75,7 @@ async function apiRequest<T = unknown>(
       allowInsecureRequest: !connection.useTls,
       debugLabel: "SurgeControl",
     })
+    recordApiCall()
     const text = await response.text()
     if (!response.ok) {
       return fail(

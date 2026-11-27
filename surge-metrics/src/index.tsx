@@ -262,24 +262,25 @@ export function App() {
   }
 
   function onCalibrate() {
-    const raw = preview ? (preview.ok ? preview.snapshot.requestTotal : preview.cache?.requestTotal) : null
+    const snapshot = preview ? (preview.ok ? preview.snapshot : preview.cache) : null
+    const adjusted = snapshot?.requestTotal ?? null
     const target = Number(calibration)
-    if (raw == null) {
-      setStatus("请先点「立即刷新并预览」拿到原始请求 ID")
+    if (adjusted == null) {
+      setStatus("请先点「立即刷新并预览」拿到请求数")
       return
     }
     if (!Number.isFinite(target) || target <= 0) {
       setStatus("请填写 Surge 仪表盘当前显示的请求数")
       return
     }
-    const offset = Math.max(0, Math.round(raw) - Math.round(target))
+    const offset = Math.max(0, Math.round(adjusted) - Math.round(target))
     const next = setSettings({
       reloadMinutes: Number(reloadMinutes) || 5,
       requestStat,
       requestOffset: offset,
     })
     setRequestOffset(next.requestOffset)
-    setStatus(`已校准：原始 ${Math.round(raw)} − 偏移 ${next.requestOffset} = ${Math.max(0, Math.round(raw) - next.requestOffset)}`)
+    setStatus(`已校准：${Math.round(adjusted)} − 偏移 ${next.requestOffset} = ${Math.max(0, Math.round(adjusted) - next.requestOffset)}`)
     reloadWidgets()
   }
 
@@ -351,7 +352,7 @@ export function App() {
           <Toggle title="使用 HTTPS (http-api-tls)" value={useTls} onChanged={(value) => { setUseTls(value); markEdited() }} />
         </Section>
 
-        <Section header={<Text>小组件</Text>} footer={<Text>流量直接读取 Surge 原生累计 counter，引擎重启后归零。Medium 显示引擎核心总览；Large 额外展示累计流量最高的 3 个网络接口。Surge 没有官方的累计请求指标，「请求总数」取 /v1/requests/recent 中最大的请求 ID 作为估算，引擎重启后归零。</Text>}>
+        <Section header={<Text>小组件</Text>} footer={<Text>流量直接读取 Surge 原生累计 counter，引擎重启后归零。Medium 显示引擎核心总览；Large 额外展示累计流量最高的 3 个网络接口。Surge 没有官方的累计请求指标，「请求总数」取 /v1/requests/recent 中最大的请求 ID 作为估算，并自动扣除小组件自己发出的 API 请求（每次刷新 4 个）；引擎重启后归零。</Text>}>
           <Picker
             title="请求刷新间隔"
             value={reloadMinutes}
@@ -381,13 +382,25 @@ export function App() {
 
         <Section
           header={<Text>请求数校准</Text>}
-          footer={<Text>「请求总数」是 Surge 请求 ID 的估算值，和仪表盘可能差一个固定数（例如引擎重启前的 ID）。把 Surge 仪表盘当前显示的请求数填进来点校准，小组件会一直减去这个差值。当前偏移：{requestOffset}</Text>}
+          footer={<Text>「请求总数」是 Surge 请求 ID 的估算值：小组件自己发出的 API 调用已自动扣除，剩下的固定差值（例如引擎重启前遗留的 ID）可以在这里一次性对齐。把 Surge 仪表盘当前显示的请求数填进来点校准即可。当前偏移：{requestOffset}</Text>}
         >
           <HStack>
             <Text>原始请求 ID</Text>
             <Spacer/>
             <Text foregroundStyle="secondaryLabel">
-              {preview ? String((preview.ok ? preview.snapshot.requestTotal : preview.cache?.requestTotal) ?? "—") : "—"}
+              {preview ? String((preview.ok ? preview.snapshot.requestTotalRaw : preview.cache?.requestTotalRaw) ?? "—") : "—"}
+            </Text>
+          </HStack>
+          <HStack>
+            <Text>已自动扣除本地 API 调用</Text>
+            <Spacer/>
+            <Text foregroundStyle="secondaryLabel">
+              {(() => {
+                const snapshot = preview ? (preview.ok ? preview.snapshot : preview.cache) : null
+                const raw = snapshot?.requestTotalRaw
+                const adjusted = snapshot?.requestTotal
+                return raw != null && adjusted != null ? String(Math.max(0, raw - adjusted)) : "—"
+              })()}
             </Text>
           </HStack>
           <TextField title="Surge 显示" value={calibration} onChanged={setCalibration} prompt="例如 2623" />
