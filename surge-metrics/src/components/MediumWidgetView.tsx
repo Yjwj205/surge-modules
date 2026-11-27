@@ -33,10 +33,10 @@ export function MediumWidgetView({ result }: Props) {
   const showControls = controlSettings.showControls
   const globalPolicy = showControls && control?.mode === "proxy" ? control.globalPolicy : null
 
-  return <VStack spacing={0} alignment="leading" frame={{ maxWidth: "infinity", maxHeight: "infinity", alignment: "topLeading" }} padding={{ horizontal: 14, top: 14, bottom: 8 }} widgetBackground={C.bg}>
+  return <VStack spacing={0} alignment="leading" frame={{ maxWidth: "infinity", maxHeight: "infinity", alignment: "topLeading" }} padding={{ horizontal: 14, top: 11, bottom: 8 }} widgetBackground={C.bg}>
     <Header fetchedAt={snapshot.fetchedAt} cached={!live} inset={8} titleFont={12} mode={showControls ? control?.mode ?? null : null}/>
 
-    <HStack spacing={8} alignment="center" frame={{ maxWidth: "infinity" }} padding={{ top: 8 }}>
+    <HStack spacing={8} alignment="center" frame={{ maxWidth: "infinity" }} padding={{ top: 6 }}>
       <RateCard icon="arrow.down.circle.fill" label="累计下行" value={down} color={C.down}/>
       <HStack frame={{ width: 1, height: 43 }} background={C.track}/>
       <RateCard icon="arrow.up.circle.fill" label="累计上行" value={up} color={C.up}/>
@@ -44,7 +44,7 @@ export function MediumWidgetView({ result }: Props) {
 
     <HStack frame={{ maxWidth: "infinity", height: 1 }} background={C.track}/>
 
-    <HStack alignment="center" frame={{ maxWidth: "infinity" }} padding={{ top: 6, bottom: 5 }}>
+    <HStack alignment="center" frame={{ maxWidth: "infinity" }} padding={{ top: 4, bottom: 4 }}>
       <StatusBlock icon="cpu" label="内存占用" value={mem} color={C.accent}/>
       <Spacer/>
       <StatusBlock icon="link" label="活跃请求" value={active} color={C.accent}/>
@@ -56,7 +56,7 @@ export function MediumWidgetView({ result }: Props) {
 
     <HStack frame={{ maxWidth: "infinity", height: 1 }} background={C.track}/>
 
-    <HStack alignment="center" frame={{ maxWidth: "infinity" }} padding={{ horizontal: 8, top: 5 }}>
+    <HStack alignment="center" frame={{ maxWidth: "infinity" }} padding={{ horizontal: 8, top: 4 }}>
       {globalPolicy
         ? <PolicyChip policy={globalPolicy} maxWidth={138} interactive={controlSettings.quickPolicies.length > 0}/>
         : bans > 0

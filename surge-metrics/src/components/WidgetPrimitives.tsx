@@ -37,12 +37,12 @@ export function ModeChip({ mode }: { mode: SurgeMode }) {
     <HStack
       spacing={4}
       alignment="center"
-      padding={{ horizontal: 7, vertical: 3 }}
+      padding={{ horizontal: 8, vertical: 3 }}
       background={style.bg}
       clipShape="capsule"
     >
-      <Image systemName={style.icon} resizable scaleToFit foregroundStyle={style.fg} frame={{ width: 11, height: 11 }}/>
-      <Text font={11} fontWeight="bold" foregroundStyle={style.fg} lineLimit={1}>{MODE_LABEL[mode] || mode}</Text>
+      <Image systemName={style.icon} resizable scaleToFit foregroundStyle={style.fg} frame={{ width: 12, height: 12 }}/>
+      <Text font={13} fontWeight="bold" foregroundStyle={style.fg} lineLimit={1}>{MODE_LABEL[mode] || mode}</Text>
     </HStack>
   </Button>
 }
@@ -64,7 +64,7 @@ export function PolicyChip({ policy, maxWidth = 148, interactive = true }: {
     {interactive
       ? <Image systemName="arrow.left.arrow.right" resizable scaleToFit foregroundStyle={C.secondary} frame={{ width: 8, height: 8 }}/>
       : <Image systemName="pin.fill" resizable scaleToFit foregroundStyle={C.tertiary} frame={{ width: 8, height: 8 }}/>}
-    <Text font={10} fontWeight="semibold" foregroundStyle={C.secondary} lineLimit={1} minScaleFactor={0.7}>{policy}</Text>
+    <Text font={11} fontWeight="semibold" foregroundStyle={C.secondary} lineLimit={1} minScaleFactor={0.7}>{policy}</Text>
   </HStack>
 
   return interactive
