@@ -261,27 +261,38 @@ export function App() {
     }
   }
 
-  function onCalibrate() {
-    const snapshot = preview ? (preview.ok ? preview.snapshot : preview.cache) : null
-    const adjusted = snapshot?.requestTotal ?? null
+  async function onCalibrate() {
     const target = Number(calibration)
-    if (adjusted == null) {
-      setStatus("请先点「立即刷新并预览」拿到请求数")
-      return
-    }
     if (!Number.isFinite(target) || target <= 0) {
-      setStatus("请填写 Surge 仪表盘当前显示的请求数")
+      setStatus("请填写 Surge App 当前显示的请求数")
       return
     }
-    const offset = Math.max(0, Math.round(adjusted) - Math.round(target))
-    const next = setSettings({
-      reloadMinutes: Number(reloadMinutes) || 5,
-      requestStat,
-      requestOffset: offset,
-    })
-    setRequestOffset(next.requestOffset)
-    setStatus(`已校准：${Math.round(adjusted)} − 偏移 ${next.requestOffset} = ${Math.max(0, Math.round(adjusted) - next.requestOffset)}`)
-    reloadWidgets()
+    setBusy(true)
+    saveConnection()
+    saveSettings()
+    setStatus("正在读取最新请求数…")
+    try {
+      const result = await fetchMetrics()
+      if (result.ok) setPreview(result)
+      const adjusted = result.ok ? result.snapshot.requestTotal : null
+      if (adjusted == null) {
+        setStatus("拿不到请求数：请确认「请求统计」是「请求总数」，并且 API Key 可用")
+        return
+      }
+      const offset = Math.max(0, Math.round(adjusted) - Math.round(target))
+      const next = setSettings({
+        reloadMinutes: Number(reloadMinutes) || 5,
+        requestStat,
+        requestOffset: offset,
+      })
+      setRequestOffset(next.requestOffset)
+      setStatus(`已校准：当前 ${Math.round(adjusted)} − 偏移 ${next.requestOffset} = ${Math.max(0, Math.round(adjusted) - next.requestOffset)}`)
+      reloadWidgets()
+    } catch (error) {
+      setStatus("校准异常：" + (error instanceof Error ? error.message : String(error)))
+    } finally {
+      setBusy(false)
+    }
   }
 
   function onToggleControls(value: boolean) {
@@ -382,7 +393,7 @@ export function App() {
 
         <Section
           header={<Text>请求数校准</Text>}
-          footer={<Text>「请求总数」是 Surge 请求 ID 的估算值：小组件自己发出的 API 调用已自动扣除，剩下的固定差值（例如引擎重启前遗留的 ID）可以在这里一次性对齐。把 Surge 仪表盘当前显示的请求数填进来点校准即可。当前偏移：{requestOffset}</Text>}
+          footer={<Text>「请求总数」是估算值，且会随时间继续增长：校准只对齐「差值」，不会把数字冻结。每次点「校准」都会重新拉一次最新数据再计算，避免用旧快照。显示按 0.1K 取整，所以 0.1K = 100 个请求——填 16442 时若渲染时已经涨到 16450 以上，就会显示 16.5K。当前偏移：{requestOffset}</Text>}
         >
           <HStack>
             <Text>原始请求 ID</Text>
@@ -400,6 +411,17 @@ export function App() {
                 const raw = snapshot?.requestTotalRaw
                 const adjusted = snapshot?.requestTotal
                 return raw != null && adjusted != null ? String(Math.max(0, raw - adjusted)) : "—"
+              })()}
+            </Text>
+          </HStack>
+          <HStack>
+            <Text>小组件将显示</Text>
+            <Spacer/>
+            <Text foregroundStyle="secondaryLabel">
+              {(() => {
+                const snapshot = preview ? (preview.ok ? preview.snapshot : preview.cache) : null
+                const adjusted = snapshot?.requestTotal
+                return adjusted != null ? String(Math.max(0, Math.round(adjusted) - requestOffset)) : "—"
               })()}
             </Text>
           </HStack>
